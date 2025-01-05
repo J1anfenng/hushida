@@ -570,6 +570,7 @@ input:focus {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   width: 300px;
   padding: 16px;
+  padding-right: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -599,10 +600,10 @@ input:focus {
 
 .route-inputs {
   display: flex;
-  align-items: center;
+  padding-right: 40px;
   flex-direction: column;
   gap: 12px;
-  width: 80%;
+  width: 78%;
 }
 
 .route-input {
@@ -657,7 +658,6 @@ input:focus {
 
 .plan-route-btn {
   width: 90%;
-  padding: 12px;
   background: #3388ff;
   color: white;
   border: none;
@@ -666,6 +666,7 @@ input:focus {
   cursor: pointer;
   font-weight: 500;
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .plan-route-btn:hover {
