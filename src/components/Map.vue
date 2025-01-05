@@ -3,7 +3,7 @@
     <!-- 搜索框 -->
     <div class="search-container">
       <div class="search-box">
-        <Icon icon="mdi:magnify" class="search-icon"/>
+        <Icon icon="ic:baseline-search" class="search-icon"/>
         <input 
           type="text" 
           placeholder="搜索校园地点..." 
@@ -50,12 +50,12 @@
       <div class="route-header">
         <h3>路线规划</h3>
         <button class="close-btn" @click="showRoutePanel = false">
-          <Icon icon="mdi:close" />
+          <Icon icon="ic:baseline-close" />
         </button>
       </div>
       <div class="route-inputs">
         <div class="route-input">
-          <Icon icon="mdi:map-marker" class="route-icon start" />
+          <Icon icon="ic:baseline-location-on" class="route-icon start" />
           <input 
             type="text" 
             v-model="startPoint"
@@ -75,7 +75,7 @@
           </div>
         </div>
         <div class="route-input">
-          <Icon icon="mdi:flag-variant" class="route-icon end" />
+          <Icon icon="ic:baseline-flag" class="route-icon end" />
           <input 
             type="text" 
             v-model="endPoint"
@@ -107,16 +107,16 @@
     <!-- 地图控制按钮 -->
     <div class="map-controls">
       <button class="control-btn" @click="zoomIn" title="放大">
-        <Icon icon="mdi:plus" class="function-icon"/>
+        <Icon icon="mdi:plus" />
       </button>
       <button class="control-btn" @click="zoomOut" title="缩小">
-        <Icon icon="mdi:minus" class="function-icon"/>
+        <Icon icon="mdi:minus" />
       </button>
       <button class="control-btn" @click="resetView" title="返回学校">
-        <Icon icon="mdi:home" class="function-icon"/>
+        <Icon icon="mdi:home" />
       </button>
       <button class="control-btn" @click="showRoutePanel = true" title="路线规划">
-        <Icon icon="mdi:routes" class="function-icon"/>
+        <Icon icon="mdi:routes" />
       </button>
     </div>
 
@@ -172,19 +172,45 @@ interface Location {
 
 // 重要地点数据
 const locations: Location[] = [
-  { name: '湖南师范大学逸夫图书馆', coords: [28.18946,112.94339], description: '逸夫图书馆',image: '/images/library.png',detailId: 'library'},
-  { name: '田家炳教学楼', coords: [28.1871, 112.9435], description: '岳麓校区主教学楼',image: '/images/library.png',detailId: '' },
-  { name: '体育馆', coords: [28.18805, 112.9435], description: '岳麓校区体育馆',image: '/images/library.png',detailId: '' },
-  { name: '校医院', coords: [28.1859, 112.9445], description: '岳麓校区医院',image: '/images/library.png',detailId: '' },
-  { name: '计算机学院', coords: [28.1868, 112.9442], description: '计算机与信息科学学院',image: '/images/library.png',detailId: '' },
-  { name: '文学院', coords: [28.1873, 112.9438], description: '文学院教学楼',image: '/images/library.png',detailId: '' },
-  { name: '大礼堂', coords: [28.1880, 112.9440], description: '岳麓校区大礼堂',image: '/images/library.png',detailId: '' },
-  { name: '东方红广场', coords: [28.1875, 112.9445], description: '校园中心广场',image: '/images/library.png',detailId: '' },
-  { name: '校门', coords: [28.1857, 112.9450], description: '岳麓校区正门',image: '/images/library.png',detailId: '' },
-  { name: '中和楼', coords: [28.1911, 112.94226], description: '中和楼',image: '/images/library.png',detailId: '' },
-  { name: '木兰食堂', coords: [28.1894, 112.94155], description: '食堂，佳园食堂',image: '/images/library.png',detailId: '' },
-  { name: '兰桂苑食堂', coords: [28.18875, 112.94155], description: '食堂，佳园食堂',image: '/images/library.png',detailId: '' },
-  
+  { name: '学生活动中心', coords: [28.18875, 112.94125], description: '湖南师范大学学生活动中心' ,image: '/images/library.png',detailId: 'library'},
+  { name: '木兰食堂', coords: [28.18935, 112.94135], description: '湖南师范大学木兰食堂',image: '/images/library.png',detailId: 'library' },
+  { name: '木兰公寓', coords: [28.19005, 112.94135], description: '湖南师范大学木兰公寓' ,image: '/images/library.png',detailId: 'library'},
+  { name: '研六舍', coords: [28.18935, 112.94075], description: '湖南师范大学研六舍',image: '/images/library.png',detailId: 'library' },
+  { name: '研二舍', coords: [28.18815, 112.94135], description: '湖南师范大学研二舍' ,image: '/images/library.png',detailId: 'library'},
+  { name: '研五舍', coords: [28.18950, 112.94208], description: '湖南师范大学研五舍' ,image: '/images/library.png',detailId: 'library'},
+  { name: '研三舍', coords: [28.18865, 112.94208], description: '湖南师范大学研三舍' ,image: '/images/library.png',detailId: 'library'},
+  { name: '至善楼', coords: [28.18765, 112.94208], description: '湖南师范大学至善楼' ,image: '/images/library.png',detailId: 'library'},
+  { name: '服装设计系', coords: [28.18615, 112.94148], description: '湖南师范大学服装设计系' ,image: '/images/library.png',detailId: 'library'},
+  { name: '理仁楼', coords: [28.18565, 112.94078], description: '湖南师范大学理仁楼',image: '/images/library.png',detailId: 'library' },
+  { name: '研一舍', coords: [28.18765, 112.94138], description: '湖南师范大学研一舍',image: '/images/library.png',detailId: 'library' },
+  { name: '外国语学院', coords: [28.1905, 112.94110], description: '湖南师范大学外国语学院',image: '/images/library.png',detailId: 'library' },
+  { name: '高师楼', coords: [28.1903, 112.94226], description: '湖南师范大学高师楼',image: '/images/library.png',detailId: 'library' },
+  { name: '图书馆', coords: [28.1895, 112.94335], description: '湖南师范大学逸夫图书馆',image: '/images/library.png',detailId: 'library' },
+  { name: '景德楼', coords: [28.1932, 112.94100], description: '湖南师范大学景德楼',image: '/images/library.png',detailId: 'library' },
+  { name: '忠烈祠', coords: [28.1926, 112.94025], description: '忠烈祠',image: '/images/library.png',detailId: 'library' },
+  { name: '岳王亭', coords: [28.19247, 112.93953], description: '岳王亭',image: '/images/library.png',detailId: 'library' },
+  { name: '经纬楼', coords: [28.1927, 112.94213], description: '湖南师范大学经纬楼',image: '/images/library.png',detailId: 'library' },
+  { name: '研究生院', coords: [28.19362, 112.94248], description: '湖南师范大学研究生院',image: '/images/library.png',detailId: 'library' },
+  { name: '红楼', coords: [28.19455, 112.94170], description: '湖南师范大学红楼',image: '/images/library.png',detailId: 'library' },
+  { name: '新闻与传播学院', coords: [28.19345, 112.94315], description: '湖南师范大学新闻与传播学院',image: '/images/library.png',detailId: 'library' },
+  { name: '二里半宿舍', coords: [28.19305, 112.94435], description: '湖南师范大学二里半宿舍',image: '/images/library.png',detailId: 'library' },
+  { name: '生命科学学院', coords: [28.19225, 112.94500], description: '湖南师范大学生命科学学院',image: '/images/library.png',detailId: 'library' },
+  { name: '教务处', coords: [28.19205, 112.9398], description: '湖南师范大学教务处',image: '/images/library.png',detailId: 'library' },
+  { name: '研五舍', coords: [28.19215, 112.94035], description: '湖南师范大学研五舍' ,image: '/images/library.png',detailId: 'library'},
+  { name: '文渊楼', coords: [28.1920, 112.9416], description: '湖南师范大学文渊楼',image: '/images/library.png',detailId: 'library' },
+  { name: '校工会', coords: [28.19165, 112.94243], description: '湖南师范大学校工会' ,image: '/images/library.png',detailId: 'library'},
+  { name: '中和楼', coords: [28.1911, 112.9419], description: '湖南师范大学中和楼' ,image: '/images/library.png',detailId: 'library'},
+  { name: '化工院', coords: [28.1912, 112.9432], description: '湖南师范大学化工院' ,image: '/images/library.png',detailId: 'library'},
+  { name: '江湾体育馆', coords: [28.18805, 112.9435], description: '湖南师范大学江湾体育馆' ,image: '/images/library.png',detailId: 'library'},
+  { name: '工学院', coords: [28.18805, 112.9443], description: '湖南师范大学工学院' ,image: '/images/library.png',detailId: 'library'},
+  { name: '理学院', coords: [28.18705, 112.94497], description: '湖南师范大学理学院' ,image: '/images/library.png',detailId: 'library'},
+  { name: '国际学术报告厅', coords: [28.18675, 112.94492], description: '湖南师范大学国际学术报告厅' ,image: '/images/library.png',detailId: 'library'},
+  { name: '田径场', coords: [28.18813, 112.94713], description: '湖南师范大学田径场',image: '/images/library.png',detailId: 'library' },
+  { name: '江边一舍', coords: [28.18880, 112.9484], description: '湖南师范大学江边一舍',image: '/images/library.png',detailId: 'library' },
+  { name: '江边二舍', coords: [28.18933, 112.9484], description: '湖南师范大学江边二舍',image: '/images/library.png',detailId: 'library' },
+  { name: '江边三舍', coords: [28.18990, 112.9485], description: '湖南师范大学江边三舍',image: '/images/library.png',detailId: 'library' },
+  { name: '江边食堂', coords: [28.19045, 112.9487], description: '湖南师范大学江边食堂' ,image: '/images/library.png',detailId: 'library'},
+  { name: '学工处', coords: [28.19041, 112.94898], description: '湖南师范大学学工处' ,image: '/images/library.png',detailId: 'library'}
 ]
 
 const mapRef = ref<HTMLElement | null>(null)
@@ -378,8 +404,12 @@ onMounted(() => {
 
     // 添加标记
     locations.forEach(location => {
-      const marker = L.marker(location.coords).addTo(mapInstance)
-        .bindPopup(`<b>${location.name}</b><br>${location.description || ''}`)
+      const marker = L.marker(location.coords)
+        .addTo(mapInstance)
+        .on('click', () => {
+          selectedLocation.value = location
+          showLocationModal.value = true
+        })
       markers.value.push(marker)
     })
 
