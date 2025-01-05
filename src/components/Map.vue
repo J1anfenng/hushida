@@ -570,6 +570,9 @@ input:focus {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   width: 300px;
   padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .route-header {
@@ -577,6 +580,7 @@ input:focus {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+  width: 100%;
 }
 
 .route-header h3 {
@@ -595,12 +599,15 @@ input:focus {
 
 .route-inputs {
   display: flex;
+  align-items: center;
   flex-direction: column;
   gap: 12px;
+  width: 80%;
 }
 
 .route-input {
   position: relative;
+  width: 100%;
 }
 
 .route-icon {
@@ -629,7 +636,9 @@ input:focus {
 
 .suggestions {
   position: absolute;
-  width: 100%;
+  width: 90%;
+  left: 50%;
+  transform: translateX(-50%);
   background: white;
   border-radius: 6px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -647,7 +656,7 @@ input:focus {
 }
 
 .plan-route-btn {
-  width: 100%;
+  width: 90%;
   padding: 12px;
   background: #3388ff;
   color: white;
