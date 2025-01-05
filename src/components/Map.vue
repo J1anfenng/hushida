@@ -173,7 +173,7 @@ interface Location {
 // 重要地点数据
 const locations: Location[] = [
   { name: '学生活动中心', coords: [28.18875, 112.94125], description: '湖南师范大学学生活动中心' ,image: '/images/library.png',detailId: 'library'},
-  // { name: '木兰食堂', coords: [28.18935, 112.94135], description: '湖南师范大学木兰食堂' },
+  { name: '木兰食堂', coords: [28.18935, 112.94135], description: '湖南师范大学木兰食堂',image: '/images/library.png',detailId: 'library' },
   { name: '木兰公寓', coords: [28.19005, 112.94135], description: '湖南师范大学木兰公寓' ,image: '/images/library.png',detailId: 'library'},
   { name: '研六舍', coords: [28.18935, 112.94075], description: '湖南师范大学研六舍',image: '/images/library.png',detailId: 'library' },
   { name: '研二舍', coords: [28.18815, 112.94135], description: '湖南师范大学研二舍' ,image: '/images/library.png',detailId: 'library'},
@@ -210,20 +210,7 @@ const locations: Location[] = [
   { name: '江边二舍', coords: [28.18933, 112.9484], description: '湖南师范大学江边二舍',image: '/images/library.png',detailId: 'library' },
   { name: '江边三舍', coords: [28.18990, 112.9485], description: '湖南师范大学江边三舍',image: '/images/library.png',detailId: 'library' },
   { name: '江边食堂', coords: [28.19045, 112.9487], description: '湖南师范大学江边食堂' ,image: '/images/library.png',detailId: 'library'},
-  // { name: '学工处', coords: [28.19041, 112.94898], description: '湖南师范大学学工处' },
-  { name: '湖南师范大学逸夫图书馆', coords: [28.18946,112.94339], description: '逸夫图书馆',image: '/images/library.png',detailId: 'library'},
-  { name: '田家炳教学楼', coords: [28.1871, 112.9435], description: '岳麓校区主教学楼',image: '/images/library.png',detailId: '' },
-  { name: '体育馆', coords: [28.18805, 112.9435], description: '岳麓校区体育馆',image: '/images/library.png',detailId: '' },
-  { name: '校医院', coords: [28.1859, 112.9445], description: '岳麓校区医院',image: '/images/library.png',detailId: '' },
-  { name: '计算机学院', coords: [28.1868, 112.9442], description: '计算机与信息科学学院',image: '/images/library.png',detailId: '' },
-  { name: '文学院', coords: [28.1873, 112.9438], description: '文学院教学楼',image: '/images/library.png',detailId: '' },
-  { name: '大礼堂', coords: [28.1880, 112.9440], description: '岳麓校区大礼堂',image: '/images/library.png',detailId: '' },
-  { name: '东方红广场', coords: [28.1875, 112.9445], description: '校园中心广场',image: '/images/library.png',detailId: '' },
-  { name: '校门', coords: [28.1857, 112.9450], description: '岳麓校区正门',image: '/images/library.png',detailId: '' },
-  { name: '中和楼', coords: [28.1911, 112.94226], description: '中和楼',image: '/images/library.png',detailId: '' },
-  { name: '木兰食堂', coords: [28.1894, 112.94155], description: '食堂，佳园食堂',image: '/images/library.png',detailId: '' },
-  { name: '兰桂苑食堂', coords: [28.18875, 112.94155], description: '食堂，佳园食堂',image: '/images/library.png',detailId: '' },
-  
+  { name: '学工处', coords: [28.19041, 112.94898], description: '湖南师范大学学工处' ,image: '/images/library.png',detailId: 'library'}
 ]
 
 const mapRef = ref<HTMLElement | null>(null)
