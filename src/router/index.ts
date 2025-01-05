@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Map from '../components/Map.vue'
+import LocationDetail from '../views/LocationDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -8,6 +9,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: Map
+    },
+    {
+      path: '/location/:id',
+      name: 'LocationDetail',
+      component: LocationDetail
     }
   ]
 })

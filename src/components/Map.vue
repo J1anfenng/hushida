@@ -121,6 +121,14 @@
     </div>
 
     <div id="map" ref="mapRef"></div>
+
+    <LocationModal
+      v-if="showLocationModal"
+      :show="showLocationModal"
+      :location="selectedLocation"
+      @close="showLocationModal = false"
+      @plan-route="handlePlanRoute"
+    />
   </div>
 </template>
 
@@ -131,6 +139,7 @@ import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.js'
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css'
+import LocationModal from './LocationModal.vue'
 
 interface RoutingControl extends L.Control {
   getContainer(): HTMLElement;
@@ -157,20 +166,25 @@ interface Location {
   name: string
   coords: [number, number]
   description?: string
+  image?: string    // 添加图片URL
+  detailId: string  // 用于路由跳转的唯一标识
 }
 
 // 重要地点数据
 const locations: Location[] = [
-  { name: '岳麓校区图书馆', coords: [28.18946, 112.94339], description: '湖南师范大学岳麓校区图书馆' },
-  { name: '田家炳教学楼', coords: [28.1871, 112.9435], description: '岳麓校区主教学楼' },
-  { name: '体育馆', coords: [28.18805, 112.9435], description: '岳麓校区体育馆' },
-  { name: '学生食堂', coords: [28.1894, 112.9414], description: '岳麓校区学生食堂' },
-  { name: '校医院', coords: [28.1859, 112.9445], description: '岳麓校区医院' },
-  { name: '计算机学院', coords: [28.1868, 112.9442], description: '计算机与信息科学学院' },
-  { name: '文学院', coords: [28.192, 112.9415], description: '文学院教学楼' },
-  { name: '大礼堂', coords: [28.1880, 112.9440], description: '岳麓校区大礼堂' },
-  { name: '东方红广场', coords: [28.1875, 112.9445], description: '校园中心广场' },
-  { name: '中和楼', coords: [28.191, 112.9415], description: '中和楼' }
+  { name: '湖南师范大学逸夫图书馆', coords: [28.18946,112.94339], description: '逸夫图书馆',image: '/images/library.png',detailId: 'library'},
+  { name: '田家炳教学楼', coords: [28.1871, 112.9435], description: '岳麓校区主教学楼',image: '/images/library.png',detailId: '' },
+  { name: '体育馆', coords: [28.18805, 112.9435], description: '岳麓校区体育馆',image: '/images/library.png',detailId: '' },
+  { name: '校医院', coords: [28.1859, 112.9445], description: '岳麓校区医院',image: '/images/library.png',detailId: '' },
+  { name: '计算机学院', coords: [28.1868, 112.9442], description: '计算机与信息科学学院',image: '/images/library.png',detailId: '' },
+  { name: '文学院', coords: [28.1873, 112.9438], description: '文学院教学楼',image: '/images/library.png',detailId: '' },
+  { name: '大礼堂', coords: [28.1880, 112.9440], description: '岳麓校区大礼堂',image: '/images/library.png',detailId: '' },
+  { name: '东方红广场', coords: [28.1875, 112.9445], description: '校园中心广场',image: '/images/library.png',detailId: '' },
+  { name: '校门', coords: [28.1857, 112.9450], description: '岳麓校区正门',image: '/images/library.png',detailId: '' },
+  { name: '中和楼', coords: [28.1911, 112.94226], description: '中和楼',image: '/images/library.png',detailId: '' },
+  { name: '木兰食堂', coords: [28.1894, 112.94155], description: '食堂，佳园食堂',image: '/images/library.png',detailId: '' },
+  { name: '兰桂苑食堂', coords: [28.18875, 112.94155], description: '食堂，佳园食堂',image: '/images/library.png',detailId: '' },
+  
 ]
 
 const mapRef = ref<HTMLElement | null>(null)
@@ -212,6 +226,10 @@ const addToHistory = (location: Location) => {
   }
 }
 
+// 添加控制弹窗显示的响应式变量
+const showLocationModal = ref(false)
+const selectedLocation = ref<Location | null>(null)
+
 const navigateToLocation = (location: Location) => {
   map.value?.setView(location.coords, 18)
   markers.value.forEach(marker => {
@@ -222,6 +240,8 @@ const navigateToLocation = (location: Location) => {
   addToHistory(location)
   showSearchResults.value = false
   searchQuery.value = location.name
+  selectedLocation.value = location
+  showLocationModal.value = true
 }
 
 const handleSearchBlur = () => {
@@ -302,7 +322,11 @@ const planRoute = () => {
     ],
     router: LR.osrmv1({
       serviceUrl: 'https://router.project-osrm.org/route/v1',
-      profile: 'foot'
+      profile: 'foot',
+      urlParameters: {
+        continue_straight: true, // 避免掉头绕远路
+        overview: 'simplified', // 使用简化路径数据
+      }
     }),
     lineOptions: {
       styles: [{ color: '#3388ff', weight: 6, opacity: 0.7, dashArray: '10, 10' }]
@@ -362,6 +386,16 @@ onMounted(() => {
     mapInstance.zoomControl.setPosition('bottomright')
   }
 })
+
+const handlePlanRoute = () => {
+  if (selectedLocation.value) {
+    showLocationModal.value = false
+    showRoutePanel.value = true
+    selectedStart.value = null
+    selectedEnd.value = selectedLocation.value
+    endPoint.value = selectedLocation.value.name
+  }
+}
 </script>
 
 <style scoped>
@@ -459,12 +493,22 @@ input:focus {
 .search-results {
   max-height: 300px;
   overflow-y: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-top: 8px;
 }
 
 .search-result-item {
   display: flex;
   align-items: center;
   padding: 12px 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.search-result-item:hover {
+  background-color: #f5f5f5;
 }
 
 .location-info {
@@ -493,7 +537,13 @@ input:focus {
   padding: 8px 16px;
   font-size: 12px;
   color: #999;
-  background-color: #f8f8f8;
+  background-color: #f5f5f5;
+}
+
+.search-history {
+  background: white;
+  border-radius: 8px;
+  padding: 8px 0;
 }
 
 :deep(.leaflet-control-container) {
