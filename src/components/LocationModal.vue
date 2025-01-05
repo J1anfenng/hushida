@@ -45,7 +45,7 @@ const emit = defineEmits<{
 const router = useRouter()
 
 const goToDetail = () => {
-  if (props.location) {
+  if (props.location?.detailId) {
     router.push(`/location/${props.location.detailId}`)
   }
 }
