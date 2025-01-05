@@ -3,7 +3,7 @@
     <!-- 搜索框 -->
     <div class="search-container">
       <div class="search-box">
-        <Icon icon="mdi:magnify" class="search-icon"/>
+        <Icon icon="ic:baseline-search" class="search-icon"/>
         <input 
           type="text" 
           placeholder="搜索校园地点..." 
@@ -50,12 +50,12 @@
       <div class="route-header">
         <h3>路线规划</h3>
         <button class="close-btn" @click="showRoutePanel = false">
-          <Icon icon="mdi:close" />
+          <Icon icon="ic:baseline-close" />
         </button>
       </div>
       <div class="route-inputs">
         <div class="route-input">
-          <Icon icon="mdi:map-marker" class="route-icon start" />
+          <Icon icon="ic:baseline-location-on" class="route-icon start" />
           <input 
             type="text" 
             v-model="startPoint"
@@ -75,7 +75,7 @@
           </div>
         </div>
         <div class="route-input">
-          <Icon icon="mdi:flag-variant" class="route-icon end" />
+          <Icon icon="ic:baseline-flag" class="route-icon end" />
           <input 
             type="text" 
             v-model="endPoint"
@@ -107,16 +107,16 @@
     <!-- 地图控制按钮 -->
     <div class="map-controls">
       <button class="control-btn" @click="zoomIn" title="放大">
-        <Icon icon="mdi:plus" />
+        <Icon icon="ic:baseline-add" />
       </button>
       <button class="control-btn" @click="zoomOut" title="缩小">
-        <Icon icon="mdi:minus" />
+        <Icon icon="ic:baseline-remove" />
       </button>
       <button class="control-btn" @click="resetView" title="返回学校">
-        <Icon icon="mdi:home" />
+        <Icon icon="ic:baseline-home" />
       </button>
       <button class="control-btn" @click="showRoutePanel = true" title="路线规划">
-        <Icon icon="mdi:routes" />
+        <Icon icon="ic:baseline-directions" />
       </button>
     </div>
 
