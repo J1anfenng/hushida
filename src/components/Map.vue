@@ -107,16 +107,16 @@
     <!-- 地图控制按钮 -->
     <div class="map-controls">
       <button class="control-btn" @click="zoomIn" title="放大">
-        <Icon icon="mdi:plus" />
+        <Icon icon="mdi:plus" class="function-icon"/>
       </button>
       <button class="control-btn" @click="zoomOut" title="缩小">
-        <Icon icon="mdi:minus" />
+        <Icon icon="mdi:minus" class="function-icon"/>
       </button>
       <button class="control-btn" @click="resetView" title="返回学校">
-        <Icon icon="mdi:home" />
+        <Icon icon="mdi:home" class="function-icon"/>
       </button>
       <button class="control-btn" @click="showRoutePanel = true" title="路线规划">
-        <Icon icon="mdi:routes" />
+        <Icon icon="mdi:routes" class="function-icon"/>
       </button>
     </div>
 
