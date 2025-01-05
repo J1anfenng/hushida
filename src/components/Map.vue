@@ -107,16 +107,16 @@
     <!-- 地图控制按钮 -->
     <div class="map-controls">
       <button class="control-btn" @click="zoomIn" title="放大">
-        <Icon icon="mdi:plus" />
+        <Icon icon="mdi:plus" class="function-icon"/>
       </button>
       <button class="control-btn" @click="zoomOut" title="缩小">
-        <Icon icon="mdi:minus" />
+        <Icon icon="mdi:minus" class="function-icon"/>
       </button>
       <button class="control-btn" @click="resetView" title="返回学校">
-        <Icon icon="mdi:home" />
+        <Icon icon="mdi:home" class="function-icon"/>
       </button>
       <button class="control-btn" @click="showRoutePanel = true" title="路线规划">
-        <Icon icon="mdi:routes" />
+        <Icon icon="mdi:routes" class="function-icon"/>
       </button>
     </div>
 
@@ -134,7 +134,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed, onUnmounted } from 'vue'
-import { Icon } from '@iconify/vue'
+import { Icon } from '@iconify/vue';
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.js'
@@ -435,6 +435,7 @@ const handlePlanRoute = () => {
   justify-content: center;
   transition: all 0.3s ease;
   color: #666;
+  position: relative;
 }
 
 .control-btn:hover {
@@ -489,6 +490,7 @@ input {
 input:focus {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+
 
 .search-results {
   max-height: 300px;
@@ -568,7 +570,7 @@ input:focus {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-  width: 300px;
+  width: 320px;
   padding: 16px;
   padding-right: 30px;
   display: flex;
@@ -688,5 +690,13 @@ input:focus {
 
 :deep(.leaflet-routing-geocoder) {
   margin: 0;
+}
+
+.function-icon {
+  font-size: 24px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 </style>
