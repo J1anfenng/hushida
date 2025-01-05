@@ -50,7 +50,32 @@ import type { Location, Comment } from '../types'
 const route = useRoute()
 const router = useRouter()
 const location = ref<Location | null>(null)
-const comments = ref<Comment[]>([])
+const comments = ref<Comment[]>([
+  {
+    id: "1",
+    username: "张同学",
+    time: "2024-03-15 14:30",
+    content: "图书馆环境很好，自习室经常爆满，建议早点来占座。"
+  },
+  {
+    id: "2", 
+    username: "李同学",
+    time: "2024-03-14 16:20",
+    content: "一楼的借阅大厅藏书很丰富，工作人员服务态度也很好。"
+  },
+  {
+    id: "3",
+    username: "王老师",
+    time: "2024-03-13 09:45", 
+    content: "图书馆的电子资源非常全面，对教学科研很有帮助。"
+  },
+  {
+    id: "4",
+    username: "刘同学",
+    time: "2024-03-12 20:15",
+    content: "晚上自习的时候环境安静，空调温度也很舒适。"
+  }
+])
 const newComment = ref('')
 
 onMounted(async () => {
@@ -59,7 +84,16 @@ onMounted(async () => {
 })
 
 const addComment = () => {
-  // 实现添加评论的逻辑
+  if (!newComment.value.trim()) return
+  
+  comments.value.unshift({
+    id: String(comments.value.length + 1),
+    username: "访客用户", // 这里可以替换为实际的用户名
+    time: new Date().toLocaleString(),
+    content: newComment.value
+  })
+  
+  newComment.value = ""
 }
 </script>
 
@@ -130,5 +164,20 @@ const addComment = () => {
 .time {
   color: #666;
   font-size: 0.9em;
+}
+
+.comments-list {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.comments-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.comments-list::-webkit-scrollbar-thumb {
+  background-color: #ddd;
+  border-radius: 3px;
 }
 </style> 
