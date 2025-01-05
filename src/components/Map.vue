@@ -173,7 +173,7 @@ interface Location {
 // 重要地点数据
 const locations: Location[] = [
   { name: '学生活动中心', coords: [28.18875, 112.94125], description: '湖南师范大学学生活动中心' ,image: '/images/library.png',detailId: 'library'},
-  { name: '木兰食堂', coords: [28.18935, 112.94135], description: '湖南师范大学木兰食堂',image: '/images/library.png',detailId: 'library' },
+  { name: '木兰食堂', coords: [28.18940, 112.94155], description: '湖南师范大学木兰食堂',image: '/images/library.png',detailId: 'library' },
   { name: '木兰公寓', coords: [28.19005, 112.94135], description: '湖南师范大学木兰公寓' ,image: '/images/library.png',detailId: 'library'},
   { name: '研六舍', coords: [28.18935, 112.94075], description: '湖南师范大学研六舍',image: '/images/library.png',detailId: 'library' },
   { name: '研二舍', coords: [28.18815, 112.94135], description: '湖南师范大学研二舍' ,image: '/images/library.png',detailId: 'library'},
@@ -335,38 +335,51 @@ const clearRoute = () => {
 // 添加路由控制变量
 const routingControl = ref<RoutingControl | null>(null)
 
-// 修改路线规划方法
-const planRoute = () => {
-  if (!selectedStart.value || !selectedEnd.value || !map.value) return
+// 添加一个函数来调用 nearest API
+const getNearestPoint = async (coords: [number, number]) => {
+  const response = await fetch(`https://router.project-osrm.org/nearest/v1/foot/${coords[1]},${coords[0]}`);
+  const data = await response.json();
+  if (data.code === 'Ok' && data.waypoints.length > 0) {
+    return data.waypoints[0].location;
+  }
+  throw new Error('无法获取最近的道路点');
+}
 
-  clearRoute()
+// 修改 planRoute 函数以使用 nearest API
+const planRoute = async () => {
+  if (!selectedStart.value || !selectedEnd.value || !map.value) return;
 
-  const control = LR.control({
-    waypoints: [
-      L.latLng(selectedStart.value.coords[0], selectedStart.value.coords[1]),
-      L.latLng(selectedEnd.value.coords[0], selectedEnd.value.coords[1])
-    ],
-    router: LR.osrmv1({
-      serviceUrl: 'https://router.project-osrm.org/route/v1',
-      profile: 'foot',
-      urlParameters: {
-        continue_straight: true, // 避免掉头绕远路
-        overview: 'simplified', // 使用简化路径数据
-      }
-    }),
-    lineOptions: {
-      styles: [{ color: '#3388ff', weight: 6, opacity: 0.7, dashArray: '10, 10' }]
-    },
-    createMarker: () => null,
-    addWaypoints: false,
-    draggableWaypoints: false,
-    fitSelectedRoutes: true,
-    showAlternatives: false,
-    show: false
-  }) as RoutingControl
+  clearRoute();
 
-  routingControl.value = control
-  ;(control as any).addTo(map.value)
+  try {
+    const startCoords = await getNearestPoint(selectedStart.value.coords);
+    const endCoords = await getNearestPoint(selectedEnd.value.coords);
+
+    const control = LR.control({
+      waypoints: [
+        L.latLng(startCoords[1], startCoords[0]),
+        L.latLng(endCoords[1], endCoords[0])
+      ],
+      router: LR.osrmv1({
+        serviceUrl: 'https://router.project-osrm.org/route/v1',
+        profile: 'foot',
+      }),
+      lineOptions: {
+        styles: [{ color: '#3388ff', weight: 6, opacity: 0.7, dashArray: '10, 10' }]
+      },
+      createMarker: () => null,
+      addWaypoints: false,
+      draggableWaypoints: false,
+      fitSelectedRoutes: true,
+      showAlternatives: false,
+      show: false
+    }) as RoutingControl;
+
+    routingControl.value = control;
+    (control as any).addTo(map.value);
+  } catch (error) {
+    console.error('路线规划失败:', error);
+  }
 }
 
 // 添加样式
@@ -434,12 +447,16 @@ const handlePlanRoute = () => {
   height: 100vh;
   position: relative;
   z-index: 1;
+  margin: 0;
+  padding: 0;
 }
 
 #map {
   width: 100%;
   height: 100%;
   z-index: 1;
+  margin: 0;
+  padding: 0;
 }
 
 .map-controls {
