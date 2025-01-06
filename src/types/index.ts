@@ -3,6 +3,8 @@ export interface Location {
   coords: [number, number]
   description?: string
   image?: string
+  images?: string[]
+  videos?: string[]
   detailId: string
 }
 

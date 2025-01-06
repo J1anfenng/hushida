@@ -141,6 +141,7 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.js'
 import 'leaflet-routing-machine/dist/leaflet-routing-machine.css'
 import LocationModal from './LocationModal.vue'
 
+
 interface RoutingControl extends L.Control {
   getContainer(): HTMLElement;
   getPlan(): any;
@@ -163,54 +164,56 @@ declare global {
 const LR = (L as any).Routing as RoutingStatic
 
 interface Location {
-  name: string
-  coords: [number, number]
-  description?: string
-  image?: string    // 添加图片URL
-  detailId: string  // 用于路由跳转的唯一标识
+  name: string;
+  coords: [number, number];
+  description?: string;
+  image?: string;
+  detailId: string;
+  images?: string[];
+  videos?: string[];
 }
 
 // 重要地点数据
 const locations: Location[] = [
   { name: '学生活动中心', coords: [28.18875, 112.94125], description: '湖南师范大学学生活动中心' ,image: '/images/library.png',detailId: 'library'},
   { name: '木兰食堂', coords: [28.18940, 112.94155], description: '湖南师范大学木兰食堂',image: '/images/library.png',detailId: 'library' },
-  { name: '木兰公寓', coords: [28.19005, 112.94135], description: '湖南师范大学木兰公寓' ,image: '/images/library.png',detailId: 'library'},
+  { name: '木兰公寓', coords: [28.19005, 112.94135], description: '湖南师范大学世承书院' ,image: '/images/shichengshuyuan.png',detailId: 'shichengshuyuan'},
   { name: '研六舍', coords: [28.18935, 112.94075], description: '湖南师范大学研六舍',image: '/images/library.png',detailId: 'library' },
   { name: '研二舍', coords: [28.18815, 112.94135], description: '湖南师范大学研二舍' ,image: '/images/library.png',detailId: 'library'},
   { name: '研五舍', coords: [28.18950, 112.94208], description: '湖南师范大学研五舍' ,image: '/images/library.png',detailId: 'library'},
   { name: '研三舍', coords: [28.18865, 112.94208], description: '湖南师范大学研三舍' ,image: '/images/library.png',detailId: 'library'},
-  { name: '至善楼', coords: [28.18765, 112.94208], description: '湖南师范大学至善楼' ,image: '/images/library.png',detailId: 'library'},
-  { name: '服装设计系', coords: [28.18615, 112.94148], description: '湖南师范大学服装设计系' ,image: '/images/library.png',detailId: 'library'},
-  { name: '理仁楼', coords: [28.18565, 112.94078], description: '湖南师范大学理仁楼',image: '/images/library.png',detailId: 'library' },
+  { name: '至善楼', coords: [28.18765, 112.94208], description: '湖南师范大学至善楼' ,image: '/images/zhishanlou.png',detailId: 'zhishanlou'},
+  { name: '服装设计系', coords: [28.18615, 112.94148], description: '湖南师范大学服装设计系' ,image: '/images/designMajor.png',detailId: 'designMajor'},
+  { name: '理仁楼', coords: [28.18565, 112.94078], description: '湖南师范大学理仁楼',image: '/images/lirenlou.png',detailId: 'lirenlou' },
   { name: '研一舍', coords: [28.18765, 112.94138], description: '湖南师范大学研一舍',image: '/images/library.png',detailId: 'library' },
-  { name: '外国语学院', coords: [28.1905, 112.94110], description: '湖南师范大学外国语学院',image: '/images/library.png',detailId: 'library' },
-  { name: '高师楼', coords: [28.1903, 112.94226], description: '湖南师范大学高师楼',image: '/images/library.png',detailId: 'library' },
+  { name: '外国语学院', coords: [28.1905, 112.94110], description: '湖南师范大学外国语学院',image: '/images/waiguoyulou.png',detailId: 'waiguoyulou' },
+  { name: '木兰楼', coords: [28.1903, 112.94226], description: '湖南师范大学木兰楼',image: '/images/mulanlou.png',detailId: 'mulanlou.png' },
   { name: '图书馆', coords: [28.1895, 112.94335], description: '湖南师范大学逸夫图书馆',image: '/images/library.png',detailId: 'library' },
-  { name: '景德楼', coords: [28.1932, 112.94100], description: '湖南师范大学景德楼',image: '/images/library.png',detailId: 'library' },
-  { name: '忠烈祠', coords: [28.1926, 112.94025], description: '忠烈祠',image: '/images/library.png',detailId: 'library' },
-  { name: '岳王亭', coords: [28.19247, 112.93953], description: '岳王亭',image: '/images/library.png',detailId: 'library' },
-  { name: '经纬楼', coords: [28.1927, 112.94213], description: '湖南师范大学经纬楼',image: '/images/library.png',detailId: 'library' },
+  { name: '景德楼', coords: [28.1932, 112.94100], description: '湖南师范大学景德楼',image: '/images/jindelou.png',detailId: 'jindelou' },
+  { name: '忠烈祠', coords: [28.1926, 112.94025], description: '忠烈祠',image: '/images/zhonglie.png',detailId: 'zhonglie' },
+  { name: '岳王亭', coords: [28.19247, 112.93953], description: '岳王亭',image: '/images/yuwangting.png',detailId: 'yuwangting' },
+  { name: '经纬楼', coords: [28.1927, 112.94213], description: '湖南师范大学经纬楼',image: '/images/jingweilou.png',detailId: 'jingweilou' },
   { name: '研究生院', coords: [28.19362, 112.94248], description: '湖南师范大学研究生院',image: '/images/library.png',detailId: 'library' },
-  { name: '红楼', coords: [28.19455, 112.94170], description: '湖南师范大学红楼',image: '/images/library.png',detailId: 'library' },
-  { name: '新闻与传播学院', coords: [28.19345, 112.94315], description: '湖南师范大学新闻与传播学院',image: '/images/library.png',detailId: 'library' },
+  { name: '红楼', coords: [28.19455, 112.94170], description: '湖南师范大学红楼',image: '/images/honglou.png',detailId: 'honglou' },
+  { name: '新闻与传播学院', coords: [28.19345, 112.94315], description: '湖南师范大学新闻与传播学院',image: '/images/xcCollege.png',detailId: 'xcCollege' },
   { name: '二里半宿舍', coords: [28.19305, 112.94435], description: '湖南师范大学二里半宿舍',image: '/images/library.png',detailId: 'library' },
-  { name: '生命科学学院', coords: [28.19225, 112.94500], description: '湖南师范大学生命科学学院',image: '/images/library.png',detailId: 'library' },
+  { name: '生命科学学院', coords: [28.19225, 112.94500], description: '湖南师范大学生命科学学院',image: '/images/skCollege.png',detailId: 'skCollege' },
   { name: '教务处', coords: [28.19205, 112.9398], description: '湖南师范大学教务处',image: '/images/library.png',detailId: 'library' },
   { name: '研五舍', coords: [28.19215, 112.94035], description: '湖南师范大学研五舍' ,image: '/images/library.png',detailId: 'library'},
-  { name: '文渊楼', coords: [28.1920, 112.9416], description: '湖南师范大学文渊楼',image: '/images/library.png',detailId: 'library' },
+  { name: '文渊楼', coords: [28.1920, 112.9416], description: '湖南师范大学文渊楼',image: '/images/wenyuanlou.png',detailId: 'wenyuanlou' },
   { name: '校工会', coords: [28.19165, 112.94243], description: '湖南师范大学校工会' ,image: '/images/library.png',detailId: 'library'},
-  { name: '中和楼', coords: [28.1911, 112.9419], description: '湖南师范大学中和楼' ,image: '/images/library.png',detailId: 'library'},
-  { name: '化工院', coords: [28.1912, 112.9432], description: '湖南师范大学化工院' ,image: '/images/library.png',detailId: 'library'},
-  { name: '江湾体育馆', coords: [28.18805, 112.9435], description: '湖南师范大学江湾体育馆' ,image: '/images/library.png',detailId: 'library'},
-  { name: '工学院', coords: [28.18805, 112.9443], description: '湖南师范大学工学院' ,image: '/images/library.png',detailId: 'library'},
-  { name: '理学院', coords: [28.18705, 112.94497], description: '湖南师范大学理学院' ,image: '/images/library.png',detailId: 'library'},
+  { name: '中和楼', coords: [28.1911, 112.9419], description: '湖南师范大学中和楼' ,image: '/images/zhonghelou.png',detailId: 'zhonghelou'},
+  { name: '化工院', coords: [28.1912, 112.9432], description: '湖南师范大学化工院' ,image: '/images/hxCollege.png',detailId: 'hxCollege'},
+  { name: '江湾体育馆', coords: [28.18805, 112.9435], description: '湖南师范大学江湾体育馆' ,image: '/images/jyGym.png',detailId: 'jyGym'},
+  { name: '工学院', coords: [28.18805, 112.9443], description: '湖南师范大学工学院' ,image: '/images/gsCollege.png',detailId: 'library'},
+  { name: '理学院', coords: [28.18705, 112.94497], description: '湖南师范大学理学院' ,image: '/images/lxCollege.png',detailId: 'lxCollege'},
   { name: '国际学术报告厅', coords: [28.18675, 112.94492], description: '湖南师范大学国际学术报告厅' ,image: '/images/library.png',detailId: 'library'},
-  { name: '田径场', coords: [28.18813, 112.94713], description: '湖南师范大学田径场',image: '/images/library.png',detailId: 'library' },
-  { name: '教育学院', coords: [28.18727, 112.94815], description: '湖南师范大学教育学院',image: '/images/library.png',detailId: 'library' },
+  { name: '田径场', coords: [28.18813, 112.94713], description: '湖南师范大学田径场',image: '/images/byPlayground.png',detailId: 'byPlayground' },
   { name: '江边一舍', coords: [28.18880, 112.9484], description: '湖南师范大学江边一舍',image: '/images/library.png',detailId: 'library' },
   { name: '江边二舍', coords: [28.18933, 112.9484], description: '湖南师范大学江边二舍',image: '/images/library.png',detailId: 'library' },
   { name: '江边三舍', coords: [28.18990, 112.9485], description: '湖南师范大学江边三舍',image: '/images/library.png',detailId: 'library' },
-  { name: '江边食堂', coords: [28.19045, 112.9487], description: '湖南师范大学江边食堂' ,image: '/images/library.png',detailId: 'library'},
+  { name: '江边食堂', coords: [28.19045, 112.9487], description: '湖南师范大学江边食堂', image: '/images/jbCanteen.jpg', detailId: 'jbCanteen' },
+  { name: '教育学院', coords: [28.18727, 112.94815], description: '湖南师范大学教育学院',image: '/images/jyCollege.png',detailId: 'jyCollege' },
   { name: '学工处', coords: [28.19041, 112.94898], description: '湖南师范大学学工处' ,image: '/images/library.png',detailId: 'library'}
 ]
 
@@ -336,51 +339,37 @@ const clearRoute = () => {
 // 添加路由控制变量
 const routingControl = ref<RoutingControl | null>(null)
 
-// 添加一个函数来调用 nearest API
-const getNearestPoint = async (coords: [number, number]) => {
-  const response = await fetch(`https://router.project-osrm.org/nearest/v1/foot/${coords[1]},${coords[0]}`);
-  const data = await response.json();
-  if (data.code === 'Ok' && data.waypoints.length > 0) {
-    return data.waypoints[0].location;
-  }
-  throw new Error('无法获取最近的道路点');
-}
-
-// 修改 planRoute 函数以使用 nearest API
-const planRoute = async () => {
+// 修改 planRoute 函数以不使用 nearest API
+const planRoute = () => {
   if (!selectedStart.value || !selectedEnd.value || !map.value) return;
 
   clearRoute();
 
-  try {
-    const startCoords = await getNearestPoint(selectedStart.value.coords);
-    const endCoords = await getNearestPoint(selectedEnd.value.coords);
+  const control = LR.control({
+    waypoints: [
+      L.latLng(selectedStart.value.coords[0], selectedStart.value.coords[1]),
+      L.latLng(selectedEnd.value.coords[0], selectedEnd.value.coords[1])
+    ],
+    router: LR.osrmv1({
+      serviceUrl: 'https://router.project-osrm.org/route/v1',
+      profile: 'foot',
+      options: {
+      continue_straight: true // 尽量避免掉头
+    }
+    }),
+    lineOptions: {
+      styles: [{ color: '#3388ff', weight: 6, opacity: 0.7, dashArray: '10, 10' }]
+    },
+    createMarker: () => null,
+    addWaypoints: false,
+    draggableWaypoints: false,
+    fitSelectedRoutes: true,
+    showAlternatives: false,
+    show: false
+  }) as RoutingControl;
 
-    const control = LR.control({
-      waypoints: [
-        L.latLng(startCoords[1], startCoords[0]),
-        L.latLng(endCoords[1], endCoords[0])
-      ],
-      router: LR.osrmv1({
-        serviceUrl: 'https://router.project-osrm.org/route/v1',
-        profile: 'foot',
-      }),
-      lineOptions: {
-        styles: [{ color: '#3388ff', weight: 6, opacity: 0.7, dashArray: '10, 10' }]
-      },
-      createMarker: () => null,
-      addWaypoints: false,
-      draggableWaypoints: false,
-      fitSelectedRoutes: true,
-      showAlternatives: false,
-      show: false
-    }) as RoutingControl;
-
-    routingControl.value = control;
-    (control as any).addTo(map.value);
-  } catch (error) {
-    console.error('路线规划失败:', error);
-  }
+  routingControl.value = control;
+  (control as any).addTo(map.value);
 }
 
 // 添加样式
