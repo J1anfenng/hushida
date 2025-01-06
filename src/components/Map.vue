@@ -206,6 +206,7 @@ const locations: Location[] = [
   { name: '理学院', coords: [28.18705, 112.94497], description: '湖南师范大学理学院' ,image: '/images/library.png',detailId: 'library'},
   { name: '国际学术报告厅', coords: [28.18675, 112.94492], description: '湖南师范大学国际学术报告厅' ,image: '/images/library.png',detailId: 'library'},
   { name: '田径场', coords: [28.18813, 112.94713], description: '湖南师范大学田径场',image: '/images/library.png',detailId: 'library' },
+  { name: '教育学院', coords: [28.18727, 112.94815], description: '湖南师范大学教育学院',image: '/images/library.png',detailId: 'library' },
   { name: '江边一舍', coords: [28.18880, 112.9484], description: '湖南师范大学江边一舍',image: '/images/library.png',detailId: 'library' },
   { name: '江边二舍', coords: [28.18933, 112.9484], description: '湖南师范大学江边二舍',image: '/images/library.png',detailId: 'library' },
   { name: '江边三舍', coords: [28.18990, 112.9485], description: '湖南师范大学江边三舍',image: '/images/library.png',detailId: 'library' },
