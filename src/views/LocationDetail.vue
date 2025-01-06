@@ -385,7 +385,7 @@ const addComment = () => {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #666;
+  color: #ffffff;
   font-size: 20px;
 }
 
