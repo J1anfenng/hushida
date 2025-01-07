@@ -118,6 +118,29 @@
       <button class="control-btn" @click="showRoutePanel = true" title="路线规划">
         <Icon icon="mdi:routes" class="function-icon"/>
       </button>
+      <!-- 保留项目，总体图标显示/隐藏 -->
+      <!-- <button class="control-btn" @click="toggleMarkers" title="显示/隐藏地点">
+        <Icon :icon="showMarkers ? 'mdi:map-marker-off' : 'mdi:map-marker'" class="function-icon"/>
+      </button> -->
+      <!-- 新增的分类触发器按钮和弹出按钮组 -->
+      <div class="category-controls">
+        <button class="control-btn trigger-btn" @click="toggleCategoryPanel" title="地点分类">
+          <Icon :icon="isExpanded ? 'meteor-icons:chevron-left' : 'meteor-icons:chevron-right'" class="function-icon"/>
+        </button>
+        <div class="category-buttons" :class="{ 'show-buttons': showCategoryBtns }">
+          <button 
+            v-for="category in categories" 
+            :key="category"
+            class="control-btn category-btn"
+            :class="{ active: selectedCategories.includes(category) }"
+            :style="{ backgroundColor: categoryColors[category] }"
+            @click="toggleCategory(category)"
+            :title="category"
+          >
+            <Icon :icon="categoryButtonIcons[category]" class="function-icon white-icon"/>
+          </button>
+        </div>
+      </div>
     </div>
 
     <div id="map" ref="mapRef"></div>
@@ -171,50 +194,52 @@ interface Location {
   detailId: string;
   images?: string[];
   videos?: string[];
+  category: '宿舍' | '食堂' | '文化风景' | '教学科研' | '行政' | '重要场馆';
 }
 
 // 重要地点数据
 const locations: Location[] = [
-  { name: '学生活动中心', coords: [28.18875, 112.94125], description: '湖南师范大学学生活动中心' ,image: '/images/library.png',detailId: 'library'},
-  { name: '木兰食堂', coords: [28.18940, 112.94155], description: '湖南师范大学木兰食堂',image: '/images/library.png',detailId: 'library' },
-  { name: '木兰公寓', coords: [28.19005, 112.94135], description: '湖南师范大学世承书院' ,image: '/images/shichengshuyuan.png',detailId: 'shichengshuyuan'},
-  { name: '研六舍', coords: [28.18935, 112.94075], description: '湖南师范大学研六舍',image: '/images/library.png',detailId: 'library' },
-  { name: '研二舍', coords: [28.18815, 112.94135], description: '湖南师范大学研二舍' ,image: '/images/library.png',detailId: 'library'},
-  { name: '研五舍', coords: [28.18950, 112.94208], description: '湖南师范大学研五舍' ,image: '/images/library.png',detailId: 'library'},
-  { name: '研三舍', coords: [28.18865, 112.94208], description: '湖南师范大学研三舍' ,image: '/images/library.png',detailId: 'library'},
-  { name: '至善楼', coords: [28.18765, 112.94208], description: '湖南师范大学至善楼' ,image: '/images/zhishanlou.png',detailId: 'zhishanlou'},
-  { name: '服装设计系', coords: [28.18615, 112.94148], description: '湖南师范大学服装设计系' ,image: '/images/designMajor.png',detailId: 'designMajor'},
-  { name: '理仁楼', coords: [28.18565, 112.94078], description: '湖南师范大学理仁楼',image: '/images/lirenlou.png',detailId: 'lirenlou' },
-  { name: '研一舍', coords: [28.18765, 112.94138], description: '湖南师范大学研一舍',image: '/images/library.png',detailId: 'library' },
-  { name: '外国语学院', coords: [28.1905, 112.94110], description: '湖南师范大学外国语学院',image: '/images/waiguoyulou.png',detailId: 'waiguoyulou' },
-  { name: '木兰楼', coords: [28.1903, 112.94226], description: '湖南师范大学木兰楼',image: '/images/mulanlou.png',detailId: 'mulanlou.png' },
-  { name: '图书馆', coords: [28.1895, 112.94335], description: '湖南师范大学逸夫图书馆',image: '/images/library.png',detailId: 'library' },
-  { name: '景德楼', coords: [28.1932, 112.94100], description: '湖南师范大学景德楼',image: '/images/jindelou.png',detailId: 'jindelou' },
-  { name: '忠烈祠', coords: [28.1926, 112.94025], description: '忠烈祠',image: '/images/zhonglie.png',detailId: 'zhonglie' },
-  { name: '岳王亭', coords: [28.19247, 112.93953], description: '岳王亭',image: '/images/yuwangting.png',detailId: 'yuwangting' },
-  { name: '经纬楼', coords: [28.1927, 112.94213], description: '湖南师范大学经纬楼',image: '/images/jingweilou.png',detailId: 'jingweilou' },
-  { name: '研究生院', coords: [28.19362, 112.94248], description: '湖南师范大学研究生院',image: '/images/library.png',detailId: 'library' },
-  { name: '红楼', coords: [28.19455, 112.94170], description: '湖南师范大学红楼',image: '/images/honglou.png',detailId: 'honglou' },
-  { name: '新闻与传播学院', coords: [28.19345, 112.94315], description: '湖南师范大学新闻与传播学院',image: '/images/xcCollege.png',detailId: 'xcCollege' },
-  { name: '二里半宿舍', coords: [28.19305, 112.94435], description: '湖南师范大学二里半宿舍',image: '/images/library.png',detailId: 'library' },
-  { name: '生命科学学院', coords: [28.19225, 112.94500], description: '湖南师范大学生命科学学院',image: '/images/skCollege.png',detailId: 'skCollege' },
-  { name: '教务处', coords: [28.19205, 112.9398], description: '湖南师范大学教务处',image: '/images/library.png',detailId: 'library' },
-  { name: '研五舍', coords: [28.19215, 112.94035], description: '湖南师范大学研五舍' ,image: '/images/library.png',detailId: 'library'},
-  { name: '文渊楼', coords: [28.1920, 112.9416], description: '湖南师范大学文渊楼',image: '/images/wenyuanlou.png',detailId: 'wenyuanlou' },
-  { name: '校工会', coords: [28.19165, 112.94243], description: '湖南师范大学校工会' ,image: '/images/library.png',detailId: 'library'},
-  { name: '中和楼', coords: [28.1911, 112.9419], description: '湖南师范大学中和楼' ,image: '/images/zhonghelou.png',detailId: 'zhonghelou'},
-  { name: '化工院', coords: [28.1912, 112.9432], description: '湖南师范大学化工院' ,image: '/images/hxCollege.png',detailId: 'hxCollege'},
-  { name: '江湾体育馆', coords: [28.18805, 112.9435], description: '湖南师范大学江湾体育馆' ,image: '/images/jyGym.png',detailId: 'jyGym'},
-  { name: '工学院', coords: [28.18805, 112.9443], description: '湖南师范大学工学院' ,image: '/images/gsCollege.png',detailId: 'library'},
-  { name: '理学院', coords: [28.18705, 112.94497], description: '湖南师范大学理学院' ,image: '/images/lxCollege.png',detailId: 'lxCollege'},
-  { name: '国际学术报告厅', coords: [28.18675, 112.94492], description: '湖南师范大学国际学术报告厅' ,image: '/images/library.png',detailId: 'library'},
-  { name: '田径场', coords: [28.18813, 112.94713], description: '湖南师范大学田径场',image: '/images/byPlayground.png',detailId: 'byPlayground' },
-  { name: '江边一舍', coords: [28.18880, 112.9484], description: '湖南师范大学江边一舍',image: '/images/library.png',detailId: 'library' },
-  { name: '江边二舍', coords: [28.18933, 112.9484], description: '湖南师范大学江边二舍',image: '/images/library.png',detailId: 'library' },
-  { name: '江边三舍', coords: [28.18990, 112.9485], description: '湖南师范大学江边三舍',image: '/images/library.png',detailId: 'library' },
-  { name: '江边食堂', coords: [28.19045, 112.9487], description: '湖南师范大学江边食堂', image: '/images/jbCanteen.jpg', detailId: 'jbCanteen' },
-  { name: '教育学院', coords: [28.18727, 112.94815], description: '湖南师范大学教育学院',image: '/images/jyCollege.png',detailId: 'jyCollege' },
-  { name: '学工处', coords: [28.19041, 112.94898], description: '湖南师范大学学工处' ,image: '/images/library.png',detailId: 'library'}
+  { name: '兰桂苑', coords: [28.18875, 112.94125], description: '湖南师范大学学生兰桂苑', image: '/images/library.png', detailId: 'library', category: '食堂' },
+  { name: '木兰食堂', coords: [28.18940, 112.94155], description: '湖南师范大学木兰食堂', image: '/images/library.png', detailId: 'library', category: '食堂' },
+  { name: '世承书院', coords: [28.19005, 112.94135], description: '湖南师范大学世承书院', image: '/images/shichengshuyuan.png', detailId: 'shichengshuyuan', category: '教学科研' },
+  { name: '校医院', coords: [28.19005, 112.94010], description: '湖南师范大学校医院', image: '/images/shichengshuyuan.png', detailId: 'shichengshuyuan', category: '重要场馆' },
+  { name: '研六舍', coords: [28.18935, 112.94075], description: '湖南师范大学研六舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '研二舍', coords: [28.18815, 112.94135], description: '湖南师范大学研二舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '研五舍', coords: [28.18950, 112.94208], description: '湖南师范大学研五舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '研三舍', coords: [28.18865, 112.94208], description: '湖南师范大学研三舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '至善楼', coords: [28.18765, 112.94228], description: '湖南师范大学至善楼', image: '/images/zhishanlou.png', detailId: 'zhishanlou', category: '教学科研' },
+  { name: '服装设计系', coords: [28.18615, 112.94148], description: '湖南师范大学服装设计系', image: '/images/designMajor.png', detailId: 'designMajor', category: '教学科研' },
+  { name: '理仁楼', coords: [28.18565, 112.94078], description: '湖南师范大学理仁楼', image: '/images/lirenlou.png', detailId: 'lirenlou', category: '教学科研' },
+  { name: '研一舍', coords: [28.18765, 112.94138], description: '湖南师范大学研一舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '外国语学院', coords: [28.1905, 112.94110], description: '湖南师范大学外国语学院', image: '/images/waiguoyulou.png', detailId: 'waiguoyulou', category: '教学科研' },
+  { name: '木兰楼', coords: [28.1903, 112.94226], description: '湖南师范大学木兰楼', image: '/images/mulanlou.png', detailId: 'mulanlou.png', category: '教学科研' },
+  { name: '图书馆', coords: [28.1895, 112.94335], description: '湖南师范大学逸夫图书馆', image: '/images/library.png', detailId: 'library', category: '重要场馆' },
+  { name: '景德楼', coords: [28.1932, 112.94100], description: '湖南师范大学景德楼', image: '/images/jindelou.png', detailId: 'jindelou', category: '教学科研' },
+  { name: '忠烈祠', coords: [28.1926, 112.94025], description: '忠烈祠', image: '/images/zhonglie.png', detailId: 'zhonglie', category: '文化风景' },
+  { name: '岳王亭', coords: [28.19247, 112.93953], description: '岳王亭', image: '/images/yuwangting.png', detailId: 'yuwangting', category: '文化风景' },
+  { name: '经纬楼', coords: [28.1927, 112.94213], description: '湖南师范大学经纬楼', image: '/images/jingweilou.png', detailId: 'jingweilou', category: '教学科研' },
+  { name: '研究生院', coords: [28.19362, 112.94248], description: '湖南师范大学研究生院', image: '/images/library.png', detailId: 'library', category: '教学科研' },
+  { name: '红楼', coords: [28.19455, 112.94170], description: '湖南师范大学红楼', image: '/images/honglou.png', detailId: 'honglou', category: '行政' },
+  { name: '新闻与传播学院', coords: [28.19345, 112.94315], description: '湖南师范大学新闻与传播学院', image: '/images/xcCollege.png', detailId: 'xcCollege', category: '教学科研' },
+  { name: '二里半宿舍', coords: [28.19305, 112.94435], description: '湖南师范大学二里半宿舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '生命科学学院', coords: [28.19225, 112.94500], description: '湖南师范大学生命科学学院', image: '/images/skCollege.png', detailId: 'skCollege', category: '教学科研' },
+  { name: '教务处', coords: [28.19205, 112.9398], description: '湖南师范大学教务处', image: '/images/library.png', detailId: 'library', category: '行政' },
+  { name: '研五舍', coords: [28.19215, 112.94035], description: '湖南师范大学研五舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '文渊楼', coords: [28.1920, 112.9416], description: '湖南师范大学文渊楼', image: '/images/wenyuanlou.png', detailId: 'wenyuanlou', category: '教学科研' },
+  { name: '校工会', coords: [28.19165, 112.94243], description: '湖南师范大学校工会', image: '/images/library.png', detailId: 'library', category: '行政' },
+  { name: '中和楼', coords: [28.1911, 112.9419], description: '湖南师范大学中和楼', image: '/images/zhonghelou.png', detailId: 'zhonghelou', category: '教学科研' },
+  { name: '化工院', coords: [28.1912, 112.9432], description: '湖南师范大学化工院', image: '/images/hxCollege.png', detailId: 'hxCollege', category: '教学科研' },
+  { name: '江湾体育馆', coords: [28.18805, 112.9435], description: '湖南师范大学江湾体育馆', image: '/images/jyGym.png', detailId: 'jyGym', category: '重要场馆' },
+  { name: '工学院', coords: [28.18805, 112.9443], description: '湖南师范大学工学院', image: '/images/gsCollege.png', detailId: 'library', category: '教学科研' },
+  { name: '理学院', coords: [28.18705, 112.94497], description: '湖南师范大学理学院', image: '/images/lxCollege.png', detailId: 'lxCollege', category: '教学科研' },
+  { name: '国际学术报告厅', coords: [28.18675, 112.94492], description: '湖南师范大学国际学术报告厅', image: '/images/library.png', detailId: 'library', category: '重要场馆' },
+  { name: '田径场', coords: [28.18723, 112.94695], description: '湖南师范大学田径场', image: '/images/byPlayground.png', detailId: 'byPlayground', category: '重要场馆' },
+  { name: '江边一舍', coords: [28.18880, 112.9484], description: '湖南师范大学江边一舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '江边二舍', coords: [28.18933, 112.9484], description: '湖南师范大学江边二舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '江边三舍', coords: [28.18990, 112.9485], description: '湖南师范大学江边三舍', image: '/images/library.png', detailId: 'library', category: '宿舍' },
+  { name: '江边食堂', coords: [28.19045, 112.9487], description: '湖南师范大学江边食堂', image: '/images/jbCanteen.jpg', detailId: 'jbCanteen', category: '食堂' },
+  { name: '教育学院', coords: [28.18727, 112.94815], description: '湖南师范大学教育学院', image: '/images/jyCollege.png', detailId: 'jyCollege', category: '教学科研' },
+  { name: '学工处', coords: [28.19041, 112.94898], description: '湖南师范大学学工处', image: '/images/library.png', detailId: 'library', category: '行政' }
 ]
 
 const mapRef = ref<HTMLElement | null>(null)
@@ -385,6 +410,68 @@ onUnmounted(() => {
   clearRoute()
 })
 
+// 在 script 部分添加自定义图标定义
+const categoryIcons = {
+  '宿舍': L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  }),
+  '食堂': L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-orange.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  }),
+  '文化风景': L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  }),
+  '教学科研': L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  }),
+  '行政': L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-violet.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  }),
+  '重要场馆': L.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-gold.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  })
+} as const;
+
+// 修改类别图标映射
+const categoryButtonIcons = {
+  '宿舍': 'mdi:bed',
+  '食堂': 'mdi:food-fork-drink',
+  '文化风景': 'mdi:leaf',
+  '教学科研': 'mdi:book-open-page-variant',
+  '行政': 'mdi:domain',
+  '重要场馆': 'mdi:bank'
+} as const;
+
 onMounted(() => {
   // 修复 Leaflet 默认图标路径问题
   delete (L.Icon.Default.prototype as any)._getIconUrl
@@ -407,7 +494,9 @@ onMounted(() => {
 
     // 添加标记
     locations.forEach(location => {
-      const marker = L.marker(location.coords)
+      const marker = L.marker(location.coords, {
+        icon: categoryIcons[location.category]
+      })
         .addTo(mapInstance)
         .on('click', () => {
           selectedLocation.value = location
@@ -428,6 +517,64 @@ const handlePlanRoute = () => {
     selectedEnd.value = selectedLocation.value
     endPoint.value = selectedLocation.value.name
   }
+}
+
+const showMarkers = ref(true)
+
+const toggleMarkers = () => {
+  showMarkers.value = !showMarkers.value
+  markers.value.forEach(marker => {
+    if (showMarkers.value) {
+      marker.addTo(map.value!)
+    } else {
+      marker.removeFrom(map.value!)
+    }
+  })
+}
+
+
+// 添加分类相关的变量
+const categories = ['宿舍', '食堂', '文化风景', '教学科研', '行政', '重要场馆'] as const
+type Category = typeof categories[number]
+
+const categoryColors = {
+  '宿舍': '#FF4444',
+  '食堂': '#FFA500',
+  '文化风景': '#4CAF50',
+  '教学科研': '#2196F3',
+  '行政': '#9C27B0',
+  '重要场馆': '#FFD700'
+} as const
+
+const selectedCategories = ref<Category[]>(categories.slice())
+const showCategoryBtns = ref(false)
+
+// 添加分类切换方法
+const toggleCategory = (category: Category) => {
+  const index = selectedCategories.value.indexOf(category)
+  if (index > -1) {
+    selectedCategories.value.splice(index, 1)
+  } else {
+    selectedCategories.value.push(category)
+  }
+  
+  markers.value.forEach((marker, index) => {
+    const location = locations[index]
+    if (selectedCategories.value.includes(location.category)) {
+      marker.addTo(map.value!)
+    } else {
+      marker.removeFrom(map.value!)
+    }
+  })
+}
+
+// 添加新的响应式变量控制图标状态
+const isExpanded = ref(false)
+
+// 修改触发器按钮的点击处理方法
+const toggleCategoryPanel = () => {
+  showCategoryBtns.value = !showCategoryBtns.value
+  isExpanded.value = !isExpanded.value
 }
 </script>
 
@@ -735,5 +882,46 @@ input:focus {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+}
+
+/* 修改分类按钮组的样式 */
+.category-controls {
+  position: relative;
+}
+
+.category-buttons {
+  position: absolute;
+  right: 50px; /* 修改为向左展开 */
+  top: 0;
+  display: flex;
+  flex-direction: row; /* 改为水平排列 */
+  gap: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  transform: translateX(20px); /* 添加位移效果 */
+}
+
+.show-buttons {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0); /* 展开时恢复位置 */
+}
+
+.category-btn {
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.category-btn:hover {
+  transform: scale(1.1);
+}
+
+.category-btn.active {
+  box-shadow: 0 0 0 2px white;
+}
+
+.trigger-btn {
+  z-index: 1;
 }
 </style>
