@@ -43,6 +43,13 @@
       </div>
     </div>
 
+    <!-- 遮罩层 -->
+    <div 
+      class="drawer-overlay"
+      :class="{ 'show': showComments }"
+      @click="showComments = false"
+    ></div>
+
     <!-- 评论抽屉 -->
     <div 
       class="comments-drawer"
@@ -60,9 +67,89 @@
           <div class="comment-content">
             <div class="comment-user">{{ comment.username }}</div>
             <div class="comment-text">{{ comment.content }}</div>
-            <div class="comment-time">{{ comment.time }}</div>
+            <div class="comment-footer">
+              <span class="comment-time">{{ comment.time }}</span>
+              <div class="comment-actions">
+                <div 
+                  class="comment-action"
+                  :class="{ 'liked': comment.isLiked }"
+                  @click="toggleCommentLike(comment)"
+                >
+                  <Icon :icon="comment.isLiked ? 'mdi:thumb-up' : 'mdi:thumb-up-outline'" />
+                  <span v-if="comment.likes">{{ comment.likes }}</span>
+                </div>
+                <div 
+                  class="comment-action"
+                  @click="replyToComment(comment)"
+                >
+                  <Icon icon="mdi:reply" /> 回复
+                </div>
+                <div 
+                  v-if="comment.replies?.length"
+                  class="comment-action"
+                  @click="toggleReplies(comment)"
+                >
+                  <Icon :icon="comment.showReplies ? 'mdi:chevron-up' : 'mdi:chevron-down'" />
+                  {{ comment.showReplies ? '收起' : `${comment.replies.length}条回复` }}
+                </div>
+              </div>
+            </div>
+            <!-- 回复列表 -->
+            <div 
+              class="replies" 
+              v-if="comment.replies?.length && comment.showReplies"
+              :class="{ 'expanded': comment.showReplies }"
+            >
+              <div v-for="reply in comment.replies" :key="reply.id" class="reply-item">
+                <img :src="reply.avatar" class="reply-avatar" />
+                <div class="reply-content">
+                  <div class="reply-user">
+                    {{ reply.username }}
+                    <span v-if="reply.replyTo" class="reply-to">
+                      回复 <span class="reply-to-name">{{ reply.replyTo }}</span>
+                    </span>
+                  </div>
+                  <div class="reply-text">{{ reply.content }}</div>
+                  <div class="reply-footer">
+                    <span class="reply-time">{{ reply.time }}</span>
+                    <div class="comment-actions">
+                      <div 
+                        class="comment-action"
+                        :class="{ 'liked': reply.isLiked }"
+                        @click="toggleCommentLike(reply)"
+                      >
+                        <Icon :icon="reply.isLiked ? 'mdi:thumb-up' : 'mdi:thumb-up-outline'" />
+                        <span v-if="reply.likes">{{ reply.likes }}</span>
+                      </div>
+                      <div 
+                        class="comment-action"
+                        @click="replyToComment(comment, reply)"
+                      >
+                        <Icon icon="mdi:reply" /> 回复
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </div>
+      <!-- 评论输入框 -->
+      <div class="comment-input-container">
+        <input 
+          type="text" 
+          v-model="newComment"
+          :placeholder="replyTo ? `回复 ${replyTo.username}` : '写下你的评论...'"
+          @keyup.enter="submitComment"
+        />
+        <button 
+          class="submit-btn" 
+          :disabled="!newComment.trim()"
+          @click="submitComment"
+        >
+          发送
+        </button>
       </div>
     </div>
   </div>
@@ -82,6 +169,29 @@ interface Post {
   likes: number
   comments: number
   isLiked?: boolean
+}
+
+interface Comment {
+  id: number
+  username: string
+  avatar: string
+  content: string
+  time: string
+  likes?: number
+  isLiked?: boolean
+  replies?: Reply[]
+  showReplies?: boolean
+}
+
+interface Reply {
+  id: number
+  username: string
+  avatar: string
+  content: string
+  time: string
+  likes?: number
+  isLiked?: boolean
+  replyTo?: string  // 回复对象的用户名
 }
 
 const posts = ref<Post[]>([
@@ -131,14 +241,28 @@ const posts = ref<Post[]>([
 const showComments = ref(false)
 const currentPost = ref<Post | null>(null)
 
-// 模拟评论数据
-const commentsList = ref([
+// 修改评论数据，添加点赞和回复
+const commentsList = ref<Comment[]>([
   {
     id: 1,
     username: '同学A',
     avatar: '/public/icon/icon.jpeg',
     content: '图书馆确实很安静！',
-    time: '5分钟前'
+    time: '5分钟前',
+    likes: 3,
+    isLiked: false,
+    showReplies: false,
+    replies: [
+      {
+        id: 11,
+        username: '同学C',
+        avatar: '/public/icon/icon.jpeg',
+        content: '对啊，特别适合学习',
+        time: '3分钟前',
+        likes: 1,
+        isLiked: false
+      }
+    ]
   },
   {
     id: 2,
@@ -149,6 +273,9 @@ const commentsList = ref([
   }
 ])
 
+const newComment = ref('')
+const replyTo = ref<Reply | null>(null)
+
 const toggleLike = (post: Post) => {
   post.isLiked = !post.isLiked
   post.likes += post.isLiked ? 1 : -1
@@ -157,6 +284,47 @@ const toggleLike = (post: Post) => {
 const openComments = (post: Post) => {
   currentPost.value = post
   showComments.value = true
+}
+
+const toggleCommentLike = (comment: Comment) => {
+  comment.isLiked = !comment.isLiked
+  comment.likes = (comment.likes || 0) + (comment.isLiked ? 1 : -1)
+}
+
+const replyToComment = (comment: Comment, reply?: Reply) => {
+  replyTo.value = {
+    comment,
+    reply,
+    username: reply ? reply.username : comment.username
+  }
+}
+
+const submitComment = () => {
+  if (!newComment.value.trim() || !replyTo.value) return
+
+  const reply: Reply = {
+    id: Date.now(),
+    username: '我',
+    avatar: '/public/icon/icon.jpeg',
+    content: newComment.value,
+    time: '刚刚',
+    likes: 0,
+    isLiked: false,
+    replyTo: replyTo.value.reply ? replyTo.value.username : undefined
+  }
+
+  // 确保评论有 replies 数组
+  if (!replyTo.value.comment.replies) {
+    replyTo.value.comment.replies = []
+  }
+  
+  replyTo.value.comment.replies.push(reply)
+  replyTo.value = null
+  newComment.value = ''
+}
+
+const toggleReplies = (comment: Comment) => {
+  comment.showReplies = !comment.showReplies
 }
 </script>
 
@@ -190,7 +358,7 @@ const openComments = (post: Post) => {
 
 .post-header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 12px;
 }
 
@@ -203,17 +371,20 @@ const openComments = (post: Post) => {
 
 .user-info {
   flex: 1;
+  padding-top: 2px;
 }
 
 .username {
-  font-weight: 500;
-  color: #333;
+  font-weight: 600;
+  color: #1890ff;
+  font-size: 14px;
+  line-height: 1;
 }
 
 .post-time {
   font-size: 12px;
   color: #999;
-  margin-top: 2px;
+  margin-top: 6px;
 }
 
 .post-content {
@@ -270,8 +441,8 @@ const openComments = (post: Post) => {
   position: fixed;
   top: 0;
   right: -100%;
-  width: 80%;
-  max-width: 400px;
+  width: 90%;
+  max-width: 500px;
   height: 100%;
   background: white;
   box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
@@ -308,12 +479,19 @@ const openComments = (post: Post) => {
 .comments-list {
   padding: 16px;
   overflow-y: auto;
-  height: calc(100% - 53px);
+  height: calc(100% - 110px);
 }
 
 .comment-item {
   display: flex;
+  align-items: flex-start;
   margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.comment-item:last-child {
+  border-bottom: none;
 }
 
 .comment-avatar {
@@ -325,11 +503,15 @@ const openComments = (post: Post) => {
 
 .comment-content {
   flex: 1;
+  padding-top: 2px;
 }
 
 .comment-user {
-  font-weight: 500;
-  margin-bottom: 4px;
+  font-weight: 600;
+  color: #1890ff;
+  font-size: 14px;
+  line-height: 1;
+  margin-bottom: 6px;
 }
 
 .comment-text {
@@ -337,8 +519,189 @@ const openComments = (post: Post) => {
   margin-bottom: 4px;
 }
 
-.comment-time {
+.comment-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 4px;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.comment-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #666;
+  cursor: pointer;
   font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.comment-action:hover {
+  background-color: #f5f5f5;
+}
+
+.comment-action.liked {
+  color: #1890ff;
+}
+
+.replies {
+  margin-top: 12px;
+  margin-left: 24px;
+  padding-left: 12px;
+  border-left: 2px solid #f0f0f0;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease-out;
+}
+
+.replies.expanded {
+  max-height: 1000px;
+  transition: max-height 0.3s ease-in;
+}
+
+.reply-item {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #f5f5f5;
+  position: relative;
+}
+
+.reply-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.reply-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.reply-content {
+  flex: 1;
+  padding-top: 2px;
+}
+
+.reply-user {
+  font-weight: 600;
+  color: #1890ff;
+  font-size: 13px;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.reply-text {
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.reply-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.reply-time {
+  font-size: 12px;
+  color: #999;
+}
+
+.comment-input-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 16px;
+  background: white;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 8px;
+}
+
+.comment-input-container input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  outline: none;
+}
+
+.submit-btn {
+  padding: 8px 16px;
+  background: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 999;
+}
+
+.drawer-overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* 确保评论抽屉在遮罩层之上 */
+.comments-drawer {
+  z-index: 1000;
+}
+
+.reply-to {
+  color: #666;
+  font-size: 12px;
+  margin-left: 4px;
+}
+
+.reply-to-name {
+  color: #1890ff;
+  font-weight: 600;
+}
+
+/* 调整回复的缩进，使层级更清晰 */
+.reply-item {
+  position: relative;
+}
+
+.reply-item::before {
+  content: '';
+  position: absolute;
+  left: -12px;
+  top: 16px;
+  width: 8px;
+  height: 1px;
+  background-color: #f0f0f0;
+}
+
+/* 确保输入框提示文字合适 */
+.comment-input-container input::placeholder {
   color: #999;
 }
 </style> 
