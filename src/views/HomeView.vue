@@ -5,8 +5,8 @@
       <div 
         v-for="tab in tabs" 
         :key="tab.id"
-        :class="['tab-item', { active: currentTab === tab.id }]"
-        @click="currentTab = tab.id"
+        :class="['tab-item', { active: isActive(tab.id) }]"
+        @click="navigateTo(tab.id)"
       >
         {{ tab.name }}
       </div>
@@ -19,37 +19,31 @@
   </div>
 </template>
 
-<script>
-import Map from '../components/Map.vue'
+<script setup lang="ts">
+import { ref } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
-export default {
-  name: 'HomeView',
-  components: {
-    Map
-  },
-  data() {
-    return {
-      currentTab: 'map',
-      tabs: [
-        { id: 'map', name: '地图' },
-        { id: 'circle', name: '师大圈' },
-        { id: 'personal', name: '我的' }
-      ]
-    }
-  },
-  computed: {
-    currentComponent() {
-      switch (this.currentTab) {
-        case 'map':
-          return 'Map'
-        case 'circle':
-          return 'Circle'
-        case 'personal':
-          return 'Personal'
-        default:
-          return 'Map'
-      }
-    }
+const router = useRouter()
+const route = useRoute()
+
+const tabs = ref([
+  { id: 'map', name: '地图', path: '/' },
+  { id: 'circle', name: '师大圈', path: '/circle' },
+  { id: 'personal', name: '我的', path: '/personal' }
+])
+
+const isActive = (tabId: string) => {
+  const path = route.path
+  if (tabId === 'map' && (path === '/' || path.startsWith('/location'))) {
+    return true
+  }
+  return path === `/${tabId}`
+}
+
+const navigateTo = (tabId: string) => {
+  const tab = tabs.value.find(t => t.id === tabId)
+  if (tab) {
+    router.push(tab.path)
   }
 }
 </script>
@@ -60,12 +54,14 @@ export default {
   height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .tabs {
   display: flex;
   background-color: #f5f5f5;
   border-bottom: 1px solid #e8e8e8;
+  flex-shrink: 0;
 }
 
 .tab-item {
@@ -87,5 +83,6 @@ export default {
   flex: 1;
   position: relative;
   padding: 0;
+  overflow: hidden;
 }
 </style>
