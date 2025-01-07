@@ -35,8 +35,13 @@
             >
               <Icon icon="mdi:comment-outline" /> {{ post.comments }}
             </div>
-            <div class="action-item">
-              <Icon icon="mdi:share-outline" /> 分享
+            <div 
+              class="action-item"
+              :class="{ 'collected': post.isCollected }"
+              @click="toggleCollect(post)"
+            >
+              <Icon :icon="post.isCollected ? 'mdi:star' : 'mdi:star-outline'" /> 
+              {{ post.isCollected ? '已收藏' : '收藏' }}
             </div>
           </div>
         </div>
@@ -57,7 +62,7 @@
     >
       <div class="drawer-header">
         <h3>评论 ({{ currentPost?.comments || 0 }})</h3>
-        <button class="close-btn" @click="showComments = false">
+        <button class="close-btn" @click="closeComments">
           <Icon icon="mdi:close" />
         </button>
       </div>
@@ -137,16 +142,22 @@
       </div>
       <!-- 评论输入框 -->
       <div class="comment-input-container">
+        <!-- 添加取消回复按钮 -->
+        <div v-if="replyTo" class="cancel-reply" @click="cancelReply">
+          <Icon icon="mdi:close" /> 取消回复
+        </div>
+        
         <input 
           type="text" 
           v-model="newComment"
-          :placeholder="replyTo ? `回复 ${replyTo.username}` : '写下你的评论...'"
-          @keyup.enter="submitComment"
+          :placeholder="getInputPlaceholder()"
+          @click="handleInputClick"
+          @keyup.enter="handleCommentSubmit"
         />
         <button 
           class="submit-btn" 
-          :disabled="!newComment.trim()"
-          @click="submitComment"
+          :disabled="!newComment.trim() || !isLoggedIn"
+          @click="handleCommentSubmit"
         >
           发送
         </button>
@@ -156,8 +167,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Icon } from '@iconify/vue'
+import { useRouter } from 'vue-router'
 
 interface Post {
   id: number
@@ -169,6 +181,7 @@ interface Post {
   likes: number
   comments: number
   isLiked?: boolean
+  isCollected?: boolean
 }
 
 interface Comment {
@@ -193,6 +206,14 @@ interface Reply {
   isLiked?: boolean
   replyTo?: string  // 回复对象的用户名
 }
+
+interface ReplyState {
+  comment: Comment
+  reply?: Reply
+  username: string
+}
+
+const router = useRouter()
 
 const posts = ref<Post[]>([
   {
@@ -274,9 +295,31 @@ const commentsList = ref<Comment[]>([
 ])
 
 const newComment = ref('')
-const replyTo = ref<Reply | null>(null)
+const replyTo = ref<ReplyState | null>(null)
+
+const isLoggedIn = computed(() => {
+  return !!localStorage.getItem('user')
+})
+
+const handleInputClick = () => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+  }
+}
+
+const handleCommentSubmit = () => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+    return
+  }
+  submitComment()
+}
 
 const toggleLike = (post: Post) => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+    return
+  }
   post.isLiked = !post.isLiked
   post.likes += post.isLiked ? 1 : -1
 }
@@ -287,11 +330,19 @@ const openComments = (post: Post) => {
 }
 
 const toggleCommentLike = (comment: Comment) => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+    return
+  }
   comment.isLiked = !comment.isLiked
   comment.likes = (comment.likes || 0) + (comment.isLiked ? 1 : -1)
 }
 
 const replyToComment = (comment: Comment, reply?: Reply) => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+    return
+  }
   replyTo.value = {
     comment,
     reply,
@@ -299,32 +350,76 @@ const replyToComment = (comment: Comment, reply?: Reply) => {
   }
 }
 
-const submitComment = () => {
-  if (!newComment.value.trim() || !replyTo.value) return
+const getInputPlaceholder = () => {
+  if (!isLoggedIn.value) return '登录后发表评论'
+  if (replyTo.value) return `回复 ${replyTo.value.username}`
+  return '写下你的评论...'
+}
 
-  const reply: Reply = {
-    id: Date.now(),
-    username: '我',
-    avatar: '/public/icon/icon.jpeg',
-    content: newComment.value,
-    time: '刚刚',
-    likes: 0,
-    isLiked: false,
-    replyTo: replyTo.value.reply ? replyTo.value.username : undefined
-  }
-
-  // 确保评论有 replies 数组
-  if (!replyTo.value.comment.replies) {
-    replyTo.value.comment.replies = []
-  }
-  
-  replyTo.value.comment.replies.push(reply)
+const closeComments = () => {
+  showComments.value = false
   replyTo.value = null
   newComment.value = ''
 }
 
+const submitComment = () => {
+  if (!newComment.value.trim()) return
+  
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  
+  if (replyTo.value) {
+    // 添加回复
+    const reply: Reply = {
+      id: Date.now(),
+      username: user.username || '访客用户',
+      avatar: user.avatar || '/public/icon/icon.jpeg',
+      content: newComment.value,
+      time: '刚刚',
+      likes: 0,
+      isLiked: false,
+      replyTo: replyTo.value.reply ? replyTo.value.username : replyTo.value.comment.username
+    }
+
+    if (!replyTo.value.comment.replies) {
+      replyTo.value.comment.replies = []
+    }
+    replyTo.value.comment.replies.push(reply)
+    replyTo.value.comment.showReplies = true  // 自动展开回复列表
+  } else {
+    // 添加新评论
+    const comment: Comment = {
+      id: Date.now(),
+      username: user.username || '访客用户',
+      avatar: user.avatar || '/public/icon/icon.jpeg',
+      content: newComment.value,
+      time: '刚刚',
+      likes: 0,
+      isLiked: false,
+      replies: []
+    }
+    commentsList.value.unshift(comment)
+  }
+
+  newComment.value = ''
+  replyTo.value = null  // 重置回复状态
+}
+
 const toggleReplies = (comment: Comment) => {
   comment.showReplies = !comment.showReplies
+}
+
+// 添加取消回复方法
+const cancelReply = () => {
+  replyTo.value = null
+  newComment.value = '' // 可选：是否清空输入框内容
+}
+
+const toggleCollect = (post: Post) => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+    return
+  }
+  post.isCollected = !post.isCollected
 }
 </script>
 
@@ -479,7 +574,8 @@ const toggleReplies = (comment: Comment) => {
 .comments-list {
   padding: 16px;
   overflow-y: auto;
-  height: calc(100% - 110px);
+  height: calc(100% - 140px);
+  padding-bottom: 60px;
 }
 
 .comment-item {
@@ -629,12 +725,36 @@ const toggleReplies = (comment: Comment) => {
   gap: 8px;
 }
 
+.cancel-reply {
+  position: absolute;
+  top: -28px;
+  right: 16px;
+  font-size: 12px;
+  color: #ff4d4f;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+  border: 1px solid #ffccc7;
+}
+
+.cancel-reply:hover {
+  color: #ff7875;
+  background: white;
+  border-color: #ff7875;
+}
+
 .comment-input-container input {
   flex: 1;
   padding: 8px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   outline: none;
+  font-size: 14px;
 }
 
 .submit-btn {
@@ -644,6 +764,7 @@ const toggleReplies = (comment: Comment) => {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .submit-btn:disabled {
@@ -703,5 +824,19 @@ const toggleReplies = (comment: Comment) => {
 /* 确保输入框提示文字合适 */
 .comment-input-container input::placeholder {
   color: #999;
+}
+
+/* 添加未登录状态的输入框样式 */
+.comment-input-container input:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.action-item.collected {
+  color: #faad14;
+}
+
+.action-item:hover {
+  background-color: #f5f5f5;
 }
 </style> 

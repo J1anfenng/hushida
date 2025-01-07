@@ -4,6 +4,7 @@ import Map from '../components/Map.vue'
 import LocationDetail from '../views/LocationDetail.vue'
 import CircleView from '../views/CircleView.vue'
 import PersonalView from '../views/PersonalView.vue'
+import LoginView from '../views/LoginView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -31,11 +32,30 @@ const router = createRouter({
         {
           path: 'personal',
           name: 'personal',
-          component: PersonalView
+          component: PersonalView,
+          meta: { requiresAuth: true }
+        },
+        {
+          path: 'login',
+          name: 'login',
+          component: LoginView
         }
       ]
     }
   ]
+})
+
+// 路由守卫
+router.beforeEach((to, from, next) => {
+  const isLoggedIn = !!localStorage.getItem('user')
+  
+  if (to.meta.requiresAuth && !isLoggedIn) {
+    // 保存用户想要访问的页面
+    localStorage.setItem('redirectPath', to.fullPath)
+    next('/login')
+  } else {
+    next()
+  }
 })
 
 export default router 

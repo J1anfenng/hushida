@@ -98,9 +98,17 @@
           <div class="comment-form">
             <textarea 
               v-model="newComment" 
-              placeholder="写下你的评论..."
+              :placeholder="isLoggedIn ? '写下你的评论...' : '登录后发表评论'"
+              @click="handleCommentClick"
+              :disabled="!isLoggedIn"
             ></textarea>
-            <button @click="addComment">发表评论</button>
+            <button 
+              class="submit-btn"
+              @click="handleAddComment"
+              :disabled="!isLoggedIn || !newComment.trim()"
+            >
+              {{ isLoggedIn ? '发表评论' : '请先登录' }}
+            </button>
           </div>
 
           <div class="comments-list">
@@ -119,7 +127,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
 import type { Location, Comment,Detail } from '../types'
@@ -219,17 +227,34 @@ onMounted(async () => {
   // 实际项目中应该从API获取数据
 })
 
-const addComment = () => {
+const isLoggedIn = computed(() => {
+  return !!localStorage.getItem('user')
+})
+
+const handleCommentClick = () => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+  }
+}
+
+const handleAddComment = () => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+    return
+  }
+  
   if (!newComment.value.trim()) return
+  
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
   
   comments.value.unshift({
     id: String(comments.value.length + 1),
-    username: "访客用户", // 这里可以替换为实际的用户名
+    username: user.username || '访客用户',
     time: new Date().toLocaleString(),
     content: newComment.value
   })
   
-  newComment.value = ""
+  newComment.value = ''
 }
 </script>
 
@@ -560,5 +585,35 @@ const addComment = () => {
 h1 {
   font-size: 20px;
   margin: 0;
+}
+
+.comment-form textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+.comment-form textarea:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.submit-btn {
+  padding: 8px 16px;
+  background: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 </style> 
