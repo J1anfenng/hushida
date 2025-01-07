@@ -395,13 +395,22 @@ onMounted(() => {
   })
 
   if (mapRef.value) {
-    // 初始化地图
-    const mapInstance = L.map(mapRef.value).setView(HNNU_CENTER, INITIAL_ZOOM)
+    // 计算所有标记点的边界
+    const bounds = L.latLngBounds(locations.map(loc => loc.coords))
+    
+    // 初始化地图，添加更严格的限制
+    const mapInstance = L.map(mapRef.value, {
+      maxZoom: 17,  // 降低最大缩放级别
+      maxBounds: bounds.pad(0.05),  // 减小边界扩展范围到 5%
+      maxBoundsViscosity: 1.0
+    }).setView(HNNU_CENTER, INITIAL_ZOOM)
+    
     map.value = mapInstance
 
-    // 添加图层
+    // 添加图层，同步缩放限制
     L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
+      maxZoom: 17,  // 同步降低图层最大缩放级别
+      minZoom: 16,  // 提高最小缩放级别
       attribution: '© OpenStreetMap contributors'
     }).addTo(mapInstance)
 
