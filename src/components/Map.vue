@@ -443,7 +443,7 @@ const handlePlanRoute = () => {
 <style scoped>
 .map-container {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   position: relative;
   z-index: 1;
   margin: 0;
