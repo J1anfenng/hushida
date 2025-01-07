@@ -8,6 +8,14 @@ export interface Location {
   detailId: string
 }
 
+export interface Detail {
+  name: string
+  description: string
+  images: string[]
+  videos: string[]
+}
+
+
 export interface Comment {
   id: string
   username: string

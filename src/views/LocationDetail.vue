@@ -4,7 +4,7 @@
       <button class="back-button" @click="router.back()">
         <Icon icon="mdi:arrow-left" /> 返回
       </button>
-      <h1>{{ location?.name }}</h1>
+      <h1>{{ detail?.name }}</h1>
     </div>
 
     <div class="main-container">
@@ -24,7 +24,7 @@
           <div class="tab-content">
             <div v-if="currentTab === 'description'" class="description-tab">
               <div class="description-content">
-                <p>{{ location?.description }}</p>
+                <p>{{ detail?.description }}</p>
               </div>
             </div>
 
@@ -32,24 +32,24 @@
               <div class="carousel">
                 <div class="carousel-inner" :style="{ transform: `translateX(-${currentImageIndex * 100}%)` }">
                   <img 
-                    v-for="(image, index) in location?.images" 
+                    v-for="(image, index) in detail?.images" 
                     :key="index"
                     :src="image"
-                    :alt="`${location?.name} - 图片 ${index + 1}`"
+                    :alt="`${detail?.name} - 图片 ${index + 1}`"
                   >
                 </div>
-                <button class="carousel-btn prev" @click="prevImage" v-if="location?.images?.length > 1">
+                <button class="carousel-btn prev" @click="prevImage" v-if="detail?.images?.length > 1">
                   <Icon icon="mdi:chevron-left" />
                 </button>
-                <button class="carousel-btn next" @click="nextImage" v-if="location?.images?.length > 1">
+                <button class="carousel-btn next" @click="nextImage" v-if="detail?.images?.length > 1">
                   <Icon icon="mdi:chevron-right" />
                 </button>
-                <div class="carousel-counter" v-if="location?.images?.length > 1">
-                  {{ currentImageIndex + 1 }}/{{ location?.images?.length }}
+                <div class="carousel-counter" v-if="detail?.images?.length > 1">
+                  {{ currentImageIndex + 1 }}/{{ detail?.images?.length }}
                 </div>
-                <div class="carousel-indicators" v-if="location?.images?.length > 1">
+                <div class="carousel-indicators" v-if="detail?.images?.length > 1">
                   <button 
-                    v-for="(_, index) in location?.images" 
+                    v-for="(_, index) in detail?.images" 
                     :key="index"
                     :class="['indicator', { active: currentImageIndex === index }]"
                     @click="currentImageIndex = index"
@@ -62,21 +62,21 @@
               <div class="carousel">
                 <div class="carousel-inner" :style="{ transform: `translateX(-${currentVideoIndex * 100}%)` }">
                   <video 
-                    v-for="(video, index) in location?.videos"
+                    v-for="(video, index) in detail?.videos"
                     :key="index"
                     controls
                     :src="video"
                   ></video>
                 </div>
-                <button class="carousel-btn prev" @click="prevVideo" v-if="location?.videos?.length > 1">
+                <button class="carousel-btn prev" @click="prevVideo" v-if="detail?.videos?.length > 1">
                   <Icon icon="mdi:chevron-left" />
                 </button>
-                <button class="carousel-btn next" @click="nextVideo" v-if="location?.videos?.length > 1">
+                <button class="carousel-btn next" @click="nextVideo" v-if="detail?.videos?.length > 1">
                   <Icon icon="mdi:chevron-right" />
                 </button>
-                <div class="carousel-indicators" v-if="location?.videos?.length > 1">
+                <div class="carousel-indicators" v-if="detail?.videos?.length > 1">
                   <button 
-                    v-for="(_, index) in location?.videos" 
+                    v-for="(_, index) in detail?.videos" 
                     :key="index"
                     :class="['indicator', { active: currentVideoIndex === index }]"
                     @click="currentVideoIndex = index"
@@ -98,9 +98,17 @@
           <div class="comment-form">
             <textarea 
               v-model="newComment" 
-              placeholder="写下你的评论..."
+              :placeholder="isLoggedIn ? '写下你的评论...' : '登录后发表评论'"
+              @click="handleCommentClick"
+              :disabled="!isLoggedIn"
             ></textarea>
-            <button @click="addComment">发表评论</button>
+            <button 
+              class="submit-btn"
+              @click="handleAddComment"
+              :disabled="!isLoggedIn || !newComment.trim()"
+            >
+              {{ isLoggedIn ? '发表评论' : '请先登录' }}
+            </button>
           </div>
 
           <div class="comments-list">
@@ -119,17 +127,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Icon } from '@iconify/vue'
-import type { Location, Comment } from '../types'
+import type { Location, Comment,Detail } from '../types'
 
 const route = useRoute()
 const router = useRouter()
-const location = ref<Location>({
-  name: "中央图书馆",
-  detailId: "1",
-  coords: [116.3, 39.9],
+const detail = ref<Detail>({
+  name: "逸夫图书馆",
   description: `中央图书馆是一座现代化的多功能图书馆，建筑面积达50,000平方米，共有8层。
   
   馆内设施：
@@ -193,26 +199,26 @@ const currentImageIndex = ref(0)
 const currentVideoIndex = ref(0)
 
 const nextImage = () => {
-  if (!location.value?.images) return
-  currentImageIndex.value = (currentImageIndex.value + 1) % location.value.images.length
+  if (!detail.value?.images) return
+  currentImageIndex.value = (currentImageIndex.value + 1) % detail.value.images.length
 }
 
 const prevImage = () => {
-  if (!location.value?.images) return
+  if (!detail.value?.images) return
   currentImageIndex.value = currentImageIndex.value === 0 
-    ? location.value.images.length - 1 
+    ? detail.value.images.length - 1 
     : currentImageIndex.value - 1
 }
 
 const nextVideo = () => {
-  if (!location.value?.videos) return
-  currentVideoIndex.value = (currentVideoIndex.value + 1) % location.value.videos.length
+  if (!detail.value?.videos) return
+  currentVideoIndex.value = (currentVideoIndex.value + 1) % detail.value.videos.length
 }
 
 const prevVideo = () => {
-  if (!location.value?.videos) return
+  if (!detail.value?.videos) return
   currentVideoIndex.value = currentVideoIndex.value === 0 
-    ? location.value.videos.length - 1 
+    ? detail.value.videos.length - 1 
     : currentVideoIndex.value - 1
 }
 
@@ -221,17 +227,34 @@ onMounted(async () => {
   // 实际项目中应该从API获取数据
 })
 
-const addComment = () => {
+const isLoggedIn = computed(() => {
+  return !!localStorage.getItem('user')
+})
+
+const handleCommentClick = () => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+  }
+}
+
+const handleAddComment = () => {
+  if (!isLoggedIn.value) {
+    router.push('/login')
+    return
+  }
+  
   if (!newComment.value.trim()) return
+  
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
   
   comments.value.unshift({
     id: String(comments.value.length + 1),
-    username: "访客用户", // 这里可以替换为实际的用户名
+    username: user.username || '访客用户',
     time: new Date().toLocaleString(),
     content: newComment.value
   })
   
-  newComment.value = ""
+  newComment.value = ''
 }
 </script>
 
@@ -562,5 +585,35 @@ const addComment = () => {
 h1 {
   font-size: 20px;
   margin: 0;
+}
+
+.comment-form textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+.comment-form textarea:disabled {
+  background-color: #f5f5f5;
+  cursor: not-allowed;
+  color: #999;
+}
+
+.submit-btn {
+  padding: 8px 16px;
+  background: #1890ff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 </style> 

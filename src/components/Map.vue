@@ -313,7 +313,7 @@ const showStartSuggestions = ref(false)
 const showEndSuggestions = ref(false)
 const selectedStart = ref<Location | null>(null)
 const selectedEnd = ref<Location | null>(null)
-const routeLine = ref<L.Polyline | null>(null)
+
 
 // 添加建议列表计算属性
 const startSuggestions = computed(() => {
@@ -482,15 +482,21 @@ onMounted(() => {
   })
 
   if (mapRef.value) {
-    // 初始化地图
-    const mapInstance = L.map(mapRef.value).setView(HNNU_CENTER, INITIAL_ZOOM)
+    // 计算所有标记点的边界
+    const bounds = L.latLngBounds(locations.map(loc => loc.coords))
+    
+    // 初始化地图，设置最小缩放级别
+    const mapInstance = L.map(mapRef.value, {
+      attributionControl: false, // 禁用版权信息
+      minZoom: 17,  // 设置最小缩放级别
+      maxBounds: bounds.pad(0.05),  // 减小边界扩展范围到 5%
+      maxBoundsViscosity: 1.0
+    }).setView(HNNU_CENTER, INITIAL_ZOOM)
+    
     map.value = mapInstance
 
     // 添加图层
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(mapInstance)
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {}).addTo(mapInstance)
 
     // 添加标记
     locations.forEach(location => {
@@ -581,7 +587,7 @@ const toggleCategoryPanel = () => {
 <style scoped>
 .map-container {
   width: 100%;
-  height: 100vh;
+  height: 100%;
   position: relative;
   z-index: 1;
   margin: 0;
