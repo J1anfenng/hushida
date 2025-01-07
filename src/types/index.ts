@@ -6,6 +6,7 @@ export interface Location {
   images?: string[]
   videos?: string[]
   detailId: string
+  category: '宿舍' | '食堂' | '文化风景' | '教学科研' | '行政' | '重要场馆';
 }
 
 export interface Detail {

@@ -125,7 +125,7 @@
       <!-- 新增的分类触发器按钮和弹出按钮组 -->
       <div class="category-controls">
         <button class="control-btn trigger-btn" @click="toggleCategoryPanel" title="地点分类">
-          <Icon :icon="isExpanded ? 'meteor-icons:chevron-left' : 'meteor-icons:chevron-right'" class="function-icon"/>
+          <Icon :icon="isExpanded ? 'meteor-icons:chevron-right' : 'meteor-icons:chevron-left'" class="function-icon"/>
         </button>
         <div class="category-buttons" :class="{ 'show-buttons': showCategoryBtns }">
           <button 
