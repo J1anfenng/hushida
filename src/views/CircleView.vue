@@ -12,14 +12,6 @@
             </div>
           </div>
           <div class="post-content">{{ post.content }}</div>
-          <div class="post-images" v-if="post.images && post.images.length">
-            <img 
-              v-for="(image, index) in post.images" 
-              :key="index" 
-              :src="image" 
-              class="post-image"
-            />
-          </div>
           <div class="post-actions">
             <div 
               class="action-item"
@@ -34,6 +26,13 @@
               @click="openComments(post)"
             >
               <Icon icon="mdi:comment-outline" /> {{ post.comments }}
+            </div>
+            <div 
+              v-if="post.images?.length"
+              class="action-item"
+              @click="openImageViewer(post.images)"
+            >
+              <Icon icon="mdi:image" /> {{ post.images.length }}
             </div>
             <div 
               class="action-item"
@@ -163,6 +162,14 @@
         </button>
       </div>
     </div>
+
+    <!-- 添加图片查看器组件 -->
+    <ImageDialog
+      v-model:show="showImageViewer"
+      :images="currentImages"
+      :initial-index="currentImageIndex"
+      @close="closeImageViewer"
+    />
   </div>
 </template>
 
@@ -170,6 +177,7 @@
 import { ref, computed } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useRouter } from 'vue-router'
+import ImageDialog from '../components/ImageDialog.vue'
 
 interface Post {
   id: number
@@ -420,6 +428,22 @@ const toggleCollect = (post: Post) => {
     return
   }
   post.isCollected = !post.isCollected
+}
+
+// 图片查看器状态
+const showImageViewer = ref(false)
+const currentImages = ref<string[]>([])
+const currentImageIndex = ref(0)
+
+// 图片查看器方法
+const openImageViewer = (images: string[]) => {
+  currentImages.value = images
+  currentImageIndex.value = 0
+  showImageViewer.value = true
+}
+
+const closeImageViewer = () => {
+  showImageViewer.value = false
 }
 </script>
 
