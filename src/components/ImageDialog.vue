@@ -50,6 +50,12 @@
   </div>
 </template>
 
+<script lang="ts">
+export default {
+  name: 'ImageDialog'
+}
+</script>
+
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'

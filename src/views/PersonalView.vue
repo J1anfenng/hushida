@@ -134,14 +134,6 @@
               </div>
             </div>
             <div class="post-content">{{ post.content }}</div>
-            <div class="post-images" v-if="post.images && post.images.length">
-              <img 
-                v-for="(image, index) in post.images" 
-                :key="index" 
-                :src="image" 
-                class="post-image"
-              />
-            </div>
             <div class="post-actions">
               <div 
                 class="action-item"
@@ -165,10 +157,12 @@
                 <Icon icon="mdi:image" /> {{ post.images.length }}
               </div>
               <div 
-                class="action-item collected"
-                @click="removeCollection(post)"
+                class="action-item"
+                :class="{ 'collected': post.isCollected }"
+                @click="toggleCollect(post)"
               >
-                <Icon icon="mdi:star" /> 已收藏
+                <Icon :icon="post.isCollected ? 'mdi:star' : 'mdi:star-outline'" /> 
+                {{ post.isCollected ? '已收藏' : '收藏' }}
               </div>
             </div>
           </div>
