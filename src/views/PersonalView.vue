@@ -358,9 +358,9 @@ const userPosts = ref([
   {
     id: 1,
     username: '师大同学',
-    avatar: '/public/icon/icon.jpeg',
+    avatar: '/icon/icon.jpeg',
     content: '今天在图书馆学习，感觉氛围真好！',
-    images: ['/public/icon/icon.jpeg'],
+    images: ['/icon/icon.jpeg'],
     time: '2小时前',
     likes: 23,
     comments: 5,
@@ -398,9 +398,9 @@ const collections = ref([
   {
     id: 1,
     username: '校园达人',
-    avatar: '/public/icon/icon.jpeg',
+    avatar: '/icon/icon.jpeg',
     content: '逸夫图书馆是一座现代化的多功能图书馆，建筑面积达50,000平方米...',
-    images: ['/public/icon/icon.jpeg'],
+    images: ['/icon/icon.jpeg'],
     time: '2024-03-15',
     likes: 45,
     comments: 12,
@@ -447,7 +447,7 @@ const openComments = (post: Post) => {
     {
       id: 1,
       username: '同学A',
-      avatar: '/public/icon/icon.jpeg',
+      avatar: '/icon/icon.jpeg',
       content: '图书馆确实很安静！',
       time: '5分钟前',
       likes: 3,
@@ -541,7 +541,7 @@ const submitComment = () => {
     const reply: Reply = {
       id: Date.now(),
       username: user.username || '访客用户',
-      avatar: user.avatar || '/public/icon/icon.jpeg',
+      avatar: user.avatar || '/icon/icon.jpeg',
       content: newComment.value,
       time: '刚刚',
       likes: 0,
@@ -558,7 +558,7 @@ const submitComment = () => {
     const comment: Comment = {
       id: Date.now(),
       username: user.username || '访客用户',
-      avatar: user.avatar || '/public/icon/icon.jpeg',
+      avatar: user.avatar || '/icon/icon.jpeg',
       content: newComment.value,
       time: '刚刚',
       likes: 0,
@@ -1141,5 +1141,13 @@ const toggleReplies = (comment: Comment) => {
 .replies-content.expanded {
   max-height: 1000px;
   transition: max-height 0.3s ease-in;
+}
+
+.location-desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2; /* 限制为两行 */
+  line-clamp: 2; /* 标准属性 */
 }
 </style> 

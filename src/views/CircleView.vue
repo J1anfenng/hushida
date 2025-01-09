@@ -227,10 +227,10 @@ const posts = ref<Post[]>([
   {
     id: 1,
     username: '师大学子',
-    avatar: '/public/icon/icon.jpeg',
+    avatar: '/icon/icon.jpeg',
     time: '10分钟前',
     content: '今天在图书馆学习，感觉氛围真好！',
-    images: ['/public/icon/icon.jpeg'],
+    images: ['/icon/icon.jpeg'],
     likes: 23,
     comments: 5,
     isLiked: false
@@ -275,7 +275,7 @@ const commentsList = ref<Comment[]>([
   {
     id: 1,
     username: '同学A',
-    avatar: '/public/icon/icon.jpeg',
+    avatar: '/icon/icon.jpeg',
     content: '图书馆确实很安静！',
     time: '5分钟前',
     likes: 3,
@@ -285,7 +285,7 @@ const commentsList = ref<Comment[]>([
       {
         id: 11,
         username: '同学C',
-        avatar: '/public/icon/icon.jpeg',
+        avatar: '/icon/icon.jpeg',
         content: '对啊，特别适合学习',
         time: '3分钟前',
         likes: 1,
@@ -296,7 +296,7 @@ const commentsList = ref<Comment[]>([
   {
     id: 2,
     username: '同学B',
-    avatar: '/public/icon/icon.jpeg',
+    avatar: '/icon/icon.jpeg',
     content: '我也经常去那里学习',
     time: '3分钟前'
   }
@@ -380,7 +380,7 @@ const submitComment = () => {
     const reply: Reply = {
       id: Date.now(),
       username: user.username || '访客用户',
-      avatar: user.avatar || '/public/icon/icon.jpeg',
+      avatar: user.avatar || '/icon/icon.jpeg',
       content: newComment.value,
       time: '刚刚',
       likes: 0,
@@ -398,7 +398,7 @@ const submitComment = () => {
     const comment: Comment = {
       id: Date.now(),
       username: user.username || '访客用户',
-      avatar: user.avatar || '/public/icon/icon.jpeg',
+      avatar: user.avatar || '/icon/icon.jpeg',
       content: newComment.value,
       time: '刚刚',
       likes: 0,
